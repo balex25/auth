@@ -13,6 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ["8.2", "8.3", "8.4", "8.5"]
+        livewire-version: ["^3.0", "^4.0"]
 
     steps:
       - uses: actions/checkout@v6
@@ -27,9 +28,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}-${{ matrix.php-version }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}-${{ matrix.php-version }}-${{ matrix.livewire-version }}
           restore-keys: |
-            ${{ runner.os }}-composer-git-${{ matrix.php-version }}
+            ${{ runner.os }}-composer-git-${{ matrix.php-version }}-${{ matrix.livewire-version }}
 
       - name: Setup Laravel Application
         run: composer create-project --prefer-dist --no-progress laravel/laravel laravel_app_${{ matrix.php-version }} --no-interaction
@@ -37,7 +38,7 @@ jobs:
       - name: Install DevDojo Auth from local checkout
         run: |
           composer config repositories.local-auth '{"type": "path", "url": "../", "options": {"symlink": false}}'
-          composer require 'devdojo/auth:@dev' --with-all-dependencies --no-progress
+          composer require 'devdojo/auth:@dev' 'livewire/livewire:${{ matrix.livewire-version }}' --with-all-dependencies --no-progress
         working-directory: ./laravel_app_${{ matrix.php-version }}
 
       - name: Publish DevDojo Auth Assets and Config
