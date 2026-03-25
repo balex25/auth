@@ -8,12 +8,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Dusk\Browser;
 use Laravel\Dusk\Page;
-use ProtoneMedia\LaravelDuskFakes\Mails\PersistentMails;
-
 class Register extends Page
 {
-    use PersistentMails;
-
     /**
      * Get the URL for the page.
      */
@@ -39,7 +35,6 @@ class Register extends Page
 
     public function assertUserReceivedEmail()
     {
-        // Mail::fake();
         $user = User::where('email', 'johndoe@gmail.com')->first();
         Mail::assertSent(MailMessage::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email);

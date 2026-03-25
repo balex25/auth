@@ -87,8 +87,7 @@ jobs:
             pestphp/pest \
             larastan/larastan:^3.1 \
             laravel/dusk \
-            alebatistella/duskapiconf \
-            protonemedia/laravel-dusk-fakes:^1.6
+            alebatistella/duskapiconf
         working-directory: ./laravel_app_${{ matrix.php-version }}
 
       - name: Set port number based on PHP version
