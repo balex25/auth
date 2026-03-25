@@ -3,9 +3,11 @@
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 beforeEach(function () {
     User::query()->delete();
+    File::ensureDirectoryExists(config('view.compiled'));
 });
 
 it('stores a safe redirect from the login page and uses it after login', function () {

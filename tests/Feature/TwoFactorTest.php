@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
+use PragmaRX\Google2FA\Google2FA;
 
 beforeEach(function () {
     // Ensure each test starts with a clean slate
@@ -55,12 +56,13 @@ test('User keeps intended redirect through two factor login flow', function () {
         'two_factor_secret' => encrypt('JBSWY3DPEHPK3PXP'),
         'two_factor_confirmed_at' => now(),
     ]);
+    $authCode = app(Google2FA::class)->getCurrentOtp('JBSWY3DPEHPK3PXP');
 
     Session::put('url.intended', '/billing');
     Session::put('login.id', $user->id);
 
     Livewire::test('auth.two-factor-challenge')
-        ->call('submitCode', '703416')
+        ->call('submitCode', $authCode)
         ->assertHasNoErrors()
         ->assertRedirect('/billing');
 
