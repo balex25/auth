@@ -8,6 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Dusk\Browser;
 use Laravel\Dusk\Page;
+
 class Register extends Page
 {
     /**
