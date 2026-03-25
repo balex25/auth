@@ -2,10 +2,10 @@
 
 namespace Devdojo\Auth;
 
+use Devdojo\Auth\Http\Middleware\StoreIntendedRedirect;
 use Devdojo\Auth\Http\Middleware\TwoFactorChallenged;
 use Devdojo\Auth\Http\Middleware\TwoFactorEnabled;
 use Devdojo\Auth\Http\Middleware\ViewAuthSetup;
-use Devdojo\Auth\Http\Middleware\StoreIntendedRedirect;
 use Devdojo\Auth\Livewire\Setup\Alignment;
 use Devdojo\Auth\Livewire\Setup\Background;
 use Devdojo\Auth\Livewire\Setup\Color;
