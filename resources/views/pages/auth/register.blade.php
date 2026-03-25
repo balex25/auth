@@ -11,7 +11,7 @@ use function Laravel\Folio\middleware;
 use function Laravel\Folio\name;
 
 if (! isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] != true) || ! app()->isLocal()) {
-    middleware(['guest']);
+    middleware(['guest', 'store-intended-redirect']);
 }
 
 name('auth.register');
@@ -147,7 +147,7 @@ new class extends Component
 
         if (session()->get('url.intended') != route('logout.get')) {
             session()->regenerate();
-            redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
+            return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
         } else {
             session()->regenerate();
 
@@ -198,7 +198,7 @@ new class extends Component
         @endif
 
         <div class="@if(config('devdojo.auth.settings.social_providers_location') != 'top' && $showEmailRegistration){{ 'mt-3' }}@endif space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-            <span class="opacity-47">{{config('devdojo.auth.language.register.already_have_an_account')}}</span>
+            <span class="opacity-47 dark:text-white">{{config('devdojo.auth.language.register.already_have_an_account')}}</span>
             <x-auth::elements.text-link data-auth="login-link" href="{{ route('auth.login') }}">{{config('devdojo.auth.language.register.sign_in')}}</x-auth::elements.text-link>
         </div>
 

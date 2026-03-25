@@ -59,7 +59,7 @@ class SocialController
 
             Auth::login($providerUser->user);
 
-            return redirect()->to(config('devdojo.auth.settings.redirect_after_auth'));
+            return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
         } catch (\Exception $e) {
             return redirect()->route('auth.login')->with('error', 'An error occurred during authentication. Please try again.');
         }

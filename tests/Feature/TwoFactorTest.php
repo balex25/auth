@@ -48,6 +48,26 @@ test('User logs in when two factor enabled, the login.id session should be creat
     $this->assertTrue(Session::has('login.id'));
 });
 
+test('User keeps intended redirect through two factor login flow', function () {
+    config()->set('devdojo.auth.settings.enable_2fa', true);
+    $user = createUser([
+        'password' => Hash::make('password123'),
+        'two_factor_secret' => encrypt('JBSWY3DPEHPK3PXP'),
+        'two_factor_confirmed_at' => now(),
+    ]);
+
+    Session::put('url.intended', '/billing');
+    Session::put('login.id', $user->id);
+
+    Livewire::test('auth.two-factor-challenge')
+        ->call('submitCode', '703416')
+        ->assertHasNoErrors()
+        ->assertRedirect('/billing');
+
+    $this->assertTrue(Auth::check());
+    $this->assertFalse(Session::has('login.id'));
+});
+
 test('User logs in without 2FA, they should not be redirected to auth/two-factor-challenge page', function () {
     config()->set('devdojo.auth.settings.enable_2fa', true);
     $user = createUser(['password' => Hash::make('password123')]);

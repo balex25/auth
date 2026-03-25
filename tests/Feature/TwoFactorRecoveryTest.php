@@ -183,6 +183,26 @@ it('allows login with valid recovery code', function () {
         ->assertRedirect(config('devdojo.auth.settings.redirect_after_auth'));
 });
 
+it('keeps intended redirect when logging in with a valid recovery code', function () {
+    $recoveryCode = 'validcode1-validcode2';
+    $user = createUser([
+        'password' => Hash::make('password123'),
+        'two_factor_secret' => encrypt('JBSWY3DPEHPK3PXP'),
+        'two_factor_recovery_codes' => encrypt(json_encode([$recoveryCode, 'another-code'])),
+        'two_factor_confirmed_at' => now(),
+    ]);
+
+    Session::put('url.intended', '/settings/security');
+    Session::put('login.id', $user->id);
+
+    Livewire::test('auth.two-factor-challenge')
+        ->set('recovery', true)
+        ->set('recovery_code', $recoveryCode)
+        ->call('submit_recovery_code')
+        ->assertHasNoErrors()
+        ->assertRedirect('/settings/security');
+});
+
 it('rejects login with invalid recovery code', function () {
     $user = createUser([
         'password' => Hash::make('password123'),

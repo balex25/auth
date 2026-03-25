@@ -5,6 +5,7 @@ namespace Devdojo\Auth;
 use Devdojo\Auth\Http\Middleware\TwoFactorChallenged;
 use Devdojo\Auth\Http\Middleware\TwoFactorEnabled;
 use Devdojo\Auth\Http\Middleware\ViewAuthSetup;
+use Devdojo\Auth\Http\Middleware\StoreIntendedRedirect;
 use Devdojo\Auth\Livewire\Setup\Alignment;
 use Devdojo\Auth\Livewire\Setup\Background;
 use Devdojo\Auth\Livewire\Setup\Color;
@@ -33,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
         Route::middlewareGroup('two-factor-challenged', [TwoFactorChallenged::class]);
         Route::middlewareGroup('two-factor-enabled', [TwoFactorEnabled::class]);
         Route::middlewareGroup('view-auth-setup', [ViewAuthSetup::class]);
+        Route::middlewareGroup('store-intended-redirect', [StoreIntendedRedirect::class]);
 
         /*
          * Optional methods to load your package assets

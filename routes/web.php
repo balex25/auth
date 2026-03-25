@@ -26,7 +26,8 @@ Route::middleware(['auth', 'web'])->group(function () {
 
 Route::middleware(['web'])->group(function () {
     // Add social redirect and callback routes
-    Route::get('auth/{driver}/redirect', [SocialController::class, 'redirect']);
-    Route::get('auth/{driver}/callback', [SocialController::class, 'callback']);
+    Route::get('auth/{driver}/redirect', [SocialController::class, 'redirect'])
+        ->middleware('store-intended-redirect');
 
+    Route::get('auth/{driver}/callback', [SocialController::class, 'callback']);
 });

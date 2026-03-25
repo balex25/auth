@@ -9,7 +9,7 @@ use Livewire\Volt\Component;
 use Devdojo\Auth\Traits\HasConfigs;
 
 if(!isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] != true) || !app()->isLocal()){
-    middleware(['guest']);
+    middleware(['guest', 'store-intended-redirect']);
 }
 
 name('auth.login');
@@ -126,7 +126,7 @@ new class extends Component
 
             if(session()->get('url.intended') != route('logout.get')){
                 session()->regenerate();
-                redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
+                return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
             } else {
                 session()->regenerate();
                 return redirect(config('devdojo.auth.settings.redirect_after_auth'));
@@ -200,7 +200,7 @@ new class extends Component
 
             @if(config('devdojo.auth.settings.registration_enabled', true))
                 <div class="mt-3 space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-                    <span class="opacity-47"> {{ config('devdojo.auth.language.login.dont_have_an_account') }} </span>
+                    <span class="opacity-47 dark:text-white"> {{ config('devdojo.auth.language.login.dont_have_an_account') }} </span>
                     <x-auth::elements.text-link data-auth="register-link" href="{{ route('auth.register') }}">{{ config('devdojo.auth.language.login.sign_up') }}</x-auth::elements.text-link>
                 </div>
             @endif

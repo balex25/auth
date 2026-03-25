@@ -70,7 +70,7 @@ new class extends Component
         $valid = in_array($this->recovery_code, json_decode(decrypt($user->two_factor_recovery_codes)));
 
         if ($valid) {
-            $this->loginUser($user);
+            return $this->loginUser($user);
         } else {
             $this->addError('recovery_code', 'This is an invalid recovery code. Please try again.');
         }
@@ -83,12 +83,17 @@ new class extends Component
         session()->forget('login.id');
 
         event(new Login(auth()->guard('web'), $user, true));
-        
-        if(session()->get('url.intended') != route('logout.get')){
+
+        return $this->redirectAfterAuth();
+    }
+
+    protected function redirectAfterAuth()
+    {
+        if (session()->get('url.intended') != route('logout.get')) {
             return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
-        } else {
-            return redirect(config('devdojo.auth.settings.redirect_after_auth'));
         }
+
+        return redirect(config('devdojo.auth.settings.redirect_after_auth'));
     }
 }
 
