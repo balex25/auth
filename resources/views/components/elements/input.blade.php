@@ -31,11 +31,11 @@
                     for="{{ $id ?? '' }}"
                     @click="$refs.input.focus()"
                     :class="{
-                        'top-0 -translate-y-1 ml-2 text-xs text-gray-200!' : focusedOrFilled,
-                        'top-4 ml-2.5 text-[15px] text-gray-400!' : !focusedOrFilled
+                        'top-0 -translate-y-1 ml-2 text-xs text-gray-200' : focusedOrFilled,
+                        'top-4 ml-2.5 text-[15px] text-gray-400' : !focusedOrFilled
                     }"
                     class="block absolute top-0 px-1.5 py-0 font-normal leading-normal
-                           text-gray-400! dark:text-gray-500!
+                           text-gray-400 dark:text-gray-500
                            bg-gray-800 dark:bg-black
                            duration-300 ease-out cursor-text auth-component-input"
                     x-cloak
@@ -56,7 +56,7 @@
                     @focus="focused()"
                     @blur="blurred()"
                     class="auth-component-input appearance-none flex w-full h-11 px-3.5 text-sm rounded-md
-                           bg-gray-800 dark:bg-black text-gray-100! dark:text-white!
+                           bg-gray-800 dark:bg-black text-gray-100 dark:text-white
                            border border-gray-600
                            placeholder:text-gray-400 dark:placeholder:text-gray-500
                            focus:outline-none focus:ring-1 focus:ring-zinc-200 focus:border-zinc-200
