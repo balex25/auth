@@ -38,6 +38,98 @@ class Helper
         return ucwords($readable);
     }
 
+    public static function authUrl(string $routeName, array $parameters = [], bool $preserveQuery = false): string
+    {
+        $url = route($routeName, $parameters);
+        $locale = self::currentLocaleSegment();
+
+        if ($locale !== null) {
+            $url = self::prefixUrlPath($url, $locale);
+        }
+
+        if ($preserveQuery) {
+            $url = self::mergeQuery($url, request()->query());
+        }
+
+        return $url;
+    }
+
+    private static function currentLocaleSegment(): ?string
+    {
+        $locales = config('app.locales', []);
+        $locale = request()->segment(1);
+
+        if (is_string($locale) && in_array($locale, $locales, true)) {
+            return $locale;
+        }
+
+        $routeLocale = request()->route('locale');
+
+        if (is_string($routeLocale) && in_array($routeLocale, $locales, true)) {
+            return $routeLocale;
+        }
+
+        return null;
+    }
+
+    private static function prefixUrlPath(string $url, string $locale): string
+    {
+        $parts = parse_url($url);
+        $path = $parts['path'] ?? '/';
+        $localePrefix = '/'.$locale;
+
+        if ($path === $localePrefix || str_starts_with($path, $localePrefix.'/')) {
+            return $url;
+        }
+
+        $segments = array_values(array_filter(explode('/', $path), fn ($segment) => $segment !== ''));
+        $locales = config('app.locales', []);
+
+        if (isset($segments[0]) && in_array($segments[0], $locales, true)) {
+            $segments[0] = $locale;
+            $parts['path'] = '/'.implode('/', $segments);
+
+            return self::buildUrl($parts);
+        }
+
+        $parts['path'] = $localePrefix.($path === '/' ? '' : $path);
+
+        return self::buildUrl($parts);
+    }
+
+    private static function mergeQuery(string $url, array $query): string
+    {
+        if ($query === []) {
+            return $url;
+        }
+
+        $parts = parse_url($url);
+        $currentQuery = [];
+
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $currentQuery);
+        }
+
+        $parts['query'] = http_build_query(array_merge($currentQuery, $query));
+
+        return self::buildUrl($parts);
+    }
+
+    private static function buildUrl(array $parts): string
+    {
+        $scheme = isset($parts['scheme']) ? $parts['scheme'].'://' : '';
+        $host = $parts['host'] ?? '';
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+        $user = $parts['user'] ?? '';
+        $pass = isset($parts['pass']) ? ':'.$parts['pass'] : '';
+        $pass = ($user !== '' || $pass !== '') ? $pass.'@' : '';
+        $path = $parts['path'] ?? '';
+        $query = isset($parts['query']) && $parts['query'] !== '' ? '?'.$parts['query'] : '';
+        $fragment = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';
+
+        return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
+    }
+
     public static function convertHexToRGBString($hex)
     {
         // Remove the '#' character if present

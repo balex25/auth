@@ -73,7 +73,7 @@ new class extends Component
         @endif
         <div class="mt-3 space-x-0.5 text-sm leading-5 text-center" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
             <span class="opacity-47 dark:text-white">{{ $language->passwordResetRequest->or }}</span>
-            <x-auth::elements.text-link data-auth="login-link" href="{{ route('auth.login') }}">{{ $language->passwordResetRequest->return_to_login }}</x-auth::elements.text-link>
+            <x-auth::elements.text-link data-auth="login-link" href="{{ \Devdojo\Auth\Helper::authUrl('auth.login') }}">{{ $language->passwordResetRequest->return_to_login }}</x-auth::elements.text-link>
         </div>
     </x-auth::elements.container>
     @endvolt

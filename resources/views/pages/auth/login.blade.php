@@ -188,7 +188,7 @@ new class extends Component
                     <x-auth::elements.input :label="$language->login->password" type="password" wire:model="password" data-auth="password-input" id="password" name="password" autocomplete="current-password" />
                     <x-auth::elements.checkbox :label="$language->login->remember_me" wire:model="rememberMe" id="remember-me" data-auth="remember-me-input" />
                     <div class="flex items-center justify-between text-sm leading-5">
-                        <x-auth::elements.text-link href="{{ route('auth.password.request') }}" data-auth="forgot-password-link">{{ $language->login->forget_password }}</x-auth::elements.text-link>
+                        <x-auth::elements.text-link href="{{ \Devdojo\Auth\Helper::authUrl('auth.password.request') }}" data-auth="forgot-password-link">{{ $language->login->forget_password }}</x-auth::elements.text-link>
                     </div>
                 </div>
 
@@ -201,7 +201,7 @@ new class extends Component
             @if(config('devdojo.auth.settings.registration_enabled', true))
                 <div class="mt-3 space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
                     <span class="opacity-47 dark:text-white"> {{ $language->login->dont_have_an_account }} </span>
-                    <x-auth::elements.text-link data-auth="register-link" href="{{ route('auth.register') }}">{{ $language->login->sign_up }}</x-auth::elements.text-link>
+                    <x-auth::elements.text-link data-auth="register-link" href="{{ \Devdojo\Auth\Helper::authUrl('auth.register', [], true) }}">{{ $language->login->sign_up }}</x-auth::elements.text-link>
                 </div>
             @endif
 
