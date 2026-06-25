@@ -61,7 +61,7 @@ class SocialController
 
             return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
         } catch (\Exception $e) {
-            return redirect()->route('auth.login')->with('error', 'An error occurred during authentication. Please try again.');
+            return redirect()->route('auth.login')->with('error', __('auth.social.authentication_error'));
         }
     }
 
@@ -79,15 +79,14 @@ class SocialController
 
         // If no existing user and registrations are disabled, reject the request
         if (! $user && ! config('devdojo.auth.settings.registration_enabled', true)) {
-            return redirect()->route('auth.login')->with('error',
-                config('devdojo.auth.language.register.registrations_disabled', 'Registrations are currently disabled.'));
+            return redirect()->route('auth.login')->with('error', __('auth.register.registrations_disabled'));
         }
 
         if ($user) {
             $existingProvider = $user->socialProviders()->first();
             if ($existingProvider) {
                 return redirect()->route('auth.login')->with('error',
-                    "This email is already associated with a {$existingProvider->provider_slug} account. Please login using that provider.");
+                    __('auth.social.email_associated_with_provider', ['provider' => $existingProvider->provider_slug]));
             }
         }
 

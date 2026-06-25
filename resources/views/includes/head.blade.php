@@ -3,7 +3,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <title>{{ $title ?? 'Auth' }}</title>
-<meta name="description" content="{{ config('devdojo.auth.language.login.description') }}">
+<meta name="description" content="{{ __('auth.login.description') }}">
 <meta name="canonical" content="{{ url()->current() }}" />
 
 @if(!empty(request()->query())) 

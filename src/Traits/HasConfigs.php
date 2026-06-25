@@ -58,11 +58,7 @@ trait HasConfigs
                 continue;
             }
 
-            $translated = __($translationKey);
-
-            if ($translated !== $translationKey) {
-                $values[$key] = $translated;
-            }
+            $values[$key] = __($translationKey);
         }
 
         return $values;

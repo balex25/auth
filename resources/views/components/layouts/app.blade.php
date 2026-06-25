@@ -12,7 +12,7 @@
         <!-- Back to Website Link -->
         <a href="{{ url('/'.app()->getLocale()) }}" class="hidden sm:flex fixed bottom-5 right-5 z-40 justify-center items-center px-2.5 py-1.5 w-auto text-xs font-medium rounded-lg border border-white/20 cursor-pointer text-white backdrop-blur-lg-md bg-white/10 hover:bg-white/30 shadow-md transition-all active:scale-95">
             <svg class="mr-1 -ml-1 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            <p>Back to Website</p>
+            <p>{{ __('auth.layout.back_to_website') }}</p>
         </a>
 
         @if(config('devdojo.auth.appearance.background.image'))

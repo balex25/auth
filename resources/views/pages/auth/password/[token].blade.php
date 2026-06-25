@@ -79,21 +79,21 @@ new class extends Component
 
 ?>
 
-<x-auth::layouts.app>
+<x-auth::layouts.app title="{{ __('auth.passwordReset.page_title') }}">
     @volt('auth.password.token')
         <x-auth::elements.container>
             <x-auth::elements.heading
-                :text="($language->passwordReset->headline ?? 'No Heading')"
-                :description="($language->passwordReset->subheadline ?? 'No Description')"
+                :text="$language->passwordReset->headline"
+                :description="$language->passwordReset->subheadline"
                 :show_subheadline="($language->passwordReset->show_subheadline ?? false)"
             />
 
             <form wire:submit="resetPassword" class="space-y-5">
-                <x-auth::elements.input :label="config('devdojo.auth.language.passwordReset.email')" type="email" id="email" name="email" data-auth="email-input" wire:model="email" autofocus="true" />
-                <x-auth::elements.input :label="config('devdojo.auth.language.passwordReset.password')" type="password" id="password" name="password" data-auth="password-input" wire:model="password" autocomplete="new-password" />
+                <x-auth::elements.input :label="$language->passwordReset->email" type="email" id="email" name="email" data-auth="email-input" wire:model="email" autofocus="true" />
+                <x-auth::elements.input :label="$language->passwordReset->password" type="password" id="password" name="password" data-auth="password-input" wire:model="password" autocomplete="new-password" />
                 <x-auth::elements.password-requirements />
-                <x-auth::elements.input :label="config('devdojo.auth.language.passwordReset.password_confirm')" type="password" id="password_confirmation" name="password_confirmation" data-auth="password-confirm-input" wire:model="passwordConfirmation" autocomplete="new-password" />
-                <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" submit="true">{{config('devdojo.auth.language.passwordReset.button')}}</x-auth::elements.button>
+                <x-auth::elements.input :label="$language->passwordReset->password_confirm" type="password" id="password_confirmation" name="password_confirmation" data-auth="password-confirm-input" wire:model="passwordConfirmation" autocomplete="new-password" />
+                <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" submit="true">{{ $language->passwordReset->button }}</x-auth::elements.button>
             </form>
         </x-auth::elements.container>
     @endvolt

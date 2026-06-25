@@ -60,7 +60,7 @@ new class extends Component
         if($valid){
             $this->loginUser($user);
         } else {
-            $this->addError('auth_code', 'Invalid authentication code. Please try again.');
+            $this->addError('auth_code', __('auth.twoFactorChallenge.invalid_auth_code'));
         }
 
     }
@@ -72,7 +72,7 @@ new class extends Component
         if ($valid) {
             return $this->loginUser($user);
         } else {
-            $this->addError('recovery_code', 'This is an invalid recovery code. Please try again.');
+            $this->addError('recovery_code', __('auth.twoFactorChallenge.invalid_recovery_code'));
         }
     }
 
@@ -99,19 +99,19 @@ new class extends Component
 
 ?>
 
-<x-auth::layouts.app title="{{ config('devdojo.auth.language.twoFactorChallenge.page_title') }}">
+<x-auth::layouts.app title="{{ __('auth.twoFactorChallenge.page_title') }}">
     @volt('auth.two-factor-challenge')
         <x-auth::elements.container>
             <div x-data x-on:code-input-complete.window="console.log(event); $dispatch('submitCode', [event.detail.code])" class="relative w-full h-auto">
                 @if(!$recovery)
                     <x-auth::elements.heading 
-                        :text="($language->twoFactorChallenge->headline_auth ?? 'No Heading')"
-                        :description="($language->twoFactorChallenge->subheadline_auth ?? 'No Description')"
+                        :text="$language->twoFactorChallenge->headline_auth"
+                        :description="$language->twoFactorChallenge->subheadline_auth"
                         :show_subheadline="($language->twoFactorChallenge->show_subheadline_auth ?? false)" />
                 @else
                     <x-auth::elements.heading 
-                        :text="($language->twoFactorChallenge->headline_recovery ?? 'No Heading')"
-                        :description="($language->twoFactorChallenge->subheadline_recovery ?? 'No Description')"
+                        :text="$language->twoFactorChallenge->headline_recovery"
+                        :description="$language->twoFactorChallenge->subheadline_recovery"
                         :show_subheadline="($language->twoFactorChallenge->show_subheadline_recovery ?? false)" />
                 @endif
 
@@ -119,29 +119,29 @@ new class extends Component
 
                     @if(!$recovery)
                         <div class="relative">
-                            <x-auth::elements.input-code wire:model="auth_code" id="auth-input-code" digits="6" eventCallback="code-input-complete" type="text" label="Code" />
+                            <x-auth::elements.input-code wire:model="auth_code" id="auth-input-code" digits="6" eventCallback="code-input-complete" type="text" :label="$language->twoFactorChallenge->code" />
                         </div>
                         @error('auth_code')
                             <p class="my-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                        <x-auth::elements.button rounded="md" submit="true" wire:click="submitCode(document.getElementById('auth-input-code').value)">Continue</x-auth::elements.button>
+                        <x-auth::elements.button rounded="md" submit="true" wire:click="submitCode(document.getElementById('auth-input-code').value)">{{ $language->twoFactorChallenge->button }}</x-auth::elements.button>
                     @else
                         <div class="relative">
-                            <x-auth::elements.input label="Recovery Code" type="text" wire:keydown.enter="submit_recovery_code" wire:model="recovery_code" id="auth-2fa-recovery-code" required />
+                            <x-auth::elements.input :label="$language->twoFactorChallenge->recovery_code" type="text" wire:keydown.enter="submit_recovery_code" wire:model="recovery_code" id="auth-2fa-recovery-code" required />
                         </div>
-                        <x-auth::elements.button rounded="md" submit="true" wire:click="submit_recovery_code">Continue</x-auth::elements.button>
+                        <x-auth::elements.button rounded="md" submit="true" wire:click="submit_recovery_code">{{ $language->twoFactorChallenge->button }}</x-auth::elements.button>
                     @endif
 
                     
                 </div>
 
                 <div class="mt-5 space-x-0.5 text-sm leading-5 text-left" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-                    <span class="opacity-47">or you can </span>
+                    <span class="opacity-47">{{ $language->twoFactorChallenge->or_you_can }} </span>
                     <span class="font-medium underline opacity-60 cursor-pointer" wire:click="switchToRecovery" href="#_">
                         @if(!$recovery)
-                            <span>login using a recovery code</span>
+                            <span>{{ $language->twoFactorChallenge->login_using_recovery_code }}</span>
                         @else
-                            <span>login using an authentication code</span>
+                            <span>{{ $language->twoFactorChallenge->login_using_auth_code }}</span>
                         @endif
                     </span>
                 </div>
