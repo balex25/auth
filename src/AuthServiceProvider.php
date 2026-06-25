@@ -12,6 +12,7 @@ use Devdojo\Auth\Livewire\Setup\Color;
 use Devdojo\Auth\Livewire\Setup\Css;
 use Devdojo\Auth\Livewire\Setup\Favicon;
 use Devdojo\Auth\Livewire\Setup\Logo;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,7 @@ class AuthServiceProvider extends ServiceProvider
          */
         // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'auth');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'auth');
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'auth');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 

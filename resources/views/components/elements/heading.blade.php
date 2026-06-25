@@ -1,6 +1,6 @@
 @props([
     'align' => 'center',
-    'text' => 'Heading Text',
+    'text' => __('auth.heading.default_text'),
     'description' => '',
     'show_subheadline' => false
 ])
@@ -33,8 +33,8 @@
          :svgString="config('devdojo.auth.appearance.logo.svg_string')"
          />
     </div>
-    <h1 id="auth-heading-title" class="mt-1 text-xl font-medium leading-9">{{ $text ?? '' }}</h1>
+    <h1 id="auth-heading-title" class="mt-1 text-xl font-medium leading-9 text-gray-100 dark:text-white">{{ $text ?? '' }}</h1>
     @if(($description ?? false) && $show_subheadline)
-        <p id="auth-heading-description" class="mb-1.5 space-x-0.5 text-sm leading-5 text-center opacity-67">{{ $description ?? '' }}</p>
+        <p id="auth-heading-description" class="mb-1.5 space-x-0.5 text-sm leading-5 text-center opacity-67 text-gray-400 dark:text-neutral-400">{{ $description ?? '' }}</p>
     @endif
 </div>

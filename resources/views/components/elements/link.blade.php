@@ -1,6 +1,7 @@
 <a
     {{ $attributes->except('wire:navigate') }}
-    @if(config('devdojo.auth.settings.include_wire_navigate', true)) wire:navigate @endif
+    wire:navigate
+    class="underline cursor-pointer opacity-[67%] hover:opacity-[80%]"
 >
 {{ $slot }}
 </a>
