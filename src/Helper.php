@@ -54,6 +54,22 @@ class Helper
         return $url;
     }
 
+    public static function localizedUrl(string $path, bool $preserveQuery = false): string
+    {
+        $url = url($path);
+        $locale = self::currentLocaleSegment();
+
+        if ($locale !== null) {
+            $url = self::prefixUrlPath($url, $locale);
+        }
+
+        if ($preserveQuery) {
+            $url = self::mergeQuery($url, request()->query());
+        }
+
+        return $url;
+    }
+
     private static function currentLocaleSegment(): ?string
     {
         $locales = config('app.locales', []);
