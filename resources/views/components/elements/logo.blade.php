@@ -1,4 +1,4 @@
-<a href="{{ url('/'.app()->getLocale()) }}" style="height:{{ $height ?? '30' }}px; width:auto; display:block" aria-label="{{ config('app.name') }} Logo" class="group/logo active:scale-95">
+<a href="{{ \Devdojo\Auth\Helper::localizedUrl('/') }}" style="height:{{ $height ?? '30' }}px; width:auto; display:block" aria-label="{{ config('app.name') }} Logo" class="group/logo active:scale-95">
     @if($isImage)
         <img src="{{ url($imageSrc) }}" style="height:100%; width:auto" alt="" />
     @else

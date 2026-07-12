@@ -1,32 +1,35 @@
 <?php
 
 use App\Models\User;
-use function Laravel\Folio\{middleware, name};
-use Illuminate\Support\Facades\Route;
+use Devdojo\Auth\Helper;
+use Devdojo\Auth\Traits\HasConfigs;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 use PragmaRX\Google2FA\Google2FA;
-use Devdojo\Auth\Traits\HasConfigs;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Auth;
 
-if(!isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] != true) || !app()->isLocal()){
+use function Laravel\Folio\middleware;
+use function Laravel\Folio\name;
+
+if (! isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] != true) || ! app()->isLocal()) {
     middleware(['two-factor-challenged', 'throttle:5,1']);
 }
 
 name('auth.two-factor-challenge');
 
-new class extends Component
+new class() extends Component
 {
     use HasConfigs;
-    
+
     public $recovery = false;
+
     public $google2fa;
 
-    #[Validate('required|min:6')] 
+    #[Validate('required|min:6')]
     public $auth_code;
+
     public $recovery_code;
 
     public function mount()
@@ -37,16 +40,16 @@ new class extends Component
 
     public function switchToRecovery()
     {
-        $this->recovery = !$this->recovery;
-        if($this->recovery){
+        $this->recovery = ! $this->recovery;
+        if ($this->recovery) {
             $this->js("setTimeout(function(){ window.dispatchEvent(new CustomEvent('focus-auth-2fa-recovery-code', {})); }, 10);");
         } else {
             $this->js("setTimeout(function(){ window.dispatchEvent(new CustomEvent('focus-auth-2fa-auth-code', {})); }, 10);");
         }
-        return;
+
     }
 
-     #[On('submitCode')] 
+    #[On('submitCode')]
     public function submitCode($code)
     {
         $this->auth_code = $code;
@@ -57,7 +60,7 @@ new class extends Component
         $google2fa = new Google2FA();
         $valid = $google2fa->verifyKey($secret, $code);
 
-        if($valid){
+        if ($valid) {
             $this->loginUser($user);
         } else {
             $this->addError('auth_code', __('auth.twoFactorChallenge.invalid_auth_code'));
@@ -65,7 +68,8 @@ new class extends Component
 
     }
 
-    public function submit_recovery_code(){
+    public function submit_recovery_code()
+    {
         $user = User::find(session()->get('login.id'));
         $valid = in_array($this->recovery_code, json_decode(decrypt($user->two_factor_recovery_codes)));
 
@@ -76,7 +80,8 @@ new class extends Component
         }
     }
 
-    public function loginUser($user){
+    public function loginUser($user)
+    {
         Auth::login($user);
 
         // clear out the session that is used to determine if the user can visit the 2fa challenge page.
@@ -89,11 +94,11 @@ new class extends Component
 
     protected function redirectAfterAuth()
     {
-        if (session()->get('url.intended') != route('logout.get')) {
-            return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
+        if (session()->get('url.intended') != Helper::authUrl('logout.get')) {
+            return Helper::intendedRedirect(config('devdojo.auth.settings.redirect_after_auth'));
         }
 
-        return redirect(config('devdojo.auth.settings.redirect_after_auth'));
+        return redirect(Helper::localizedRedirectTarget(config('devdojo.auth.settings.redirect_after_auth')));
     }
 }
 

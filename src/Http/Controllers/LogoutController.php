@@ -2,6 +2,7 @@
 
 namespace Devdojo\Auth\Http\Controllers;
 
+use Devdojo\Auth\Helper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class LogoutController
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect(config('devdojo.auth.settings.redirect_after_logout') ?? '/');
+        return redirect(Helper::localizedRedirectTarget(config('devdojo.auth.settings.redirect_after_logout') ?? '/'));
     }
 
     /**

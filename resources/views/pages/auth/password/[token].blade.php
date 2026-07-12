@@ -1,5 +1,6 @@
 <?php
 
+use Devdojo\Auth\Helper;
 use Devdojo\Auth\Rules\PasswordStrength;
 use Devdojo\Auth\Traits\HasConfigs;
 use Illuminate\Auth\Events\PasswordReset;
@@ -14,7 +15,7 @@ use function Laravel\Folio\name;
 
 name('password.reset');
 
-new class extends Component
+new class() extends Component
 {
     use HasConfigs;
 
@@ -70,7 +71,7 @@ new class extends Component
         if ($response == Password::PASSWORD_RESET) {
             session()->flash(trans($response));
 
-            return redirect('/');
+            return redirect(Helper::localizedUrl('/'));
         }
 
         $this->addError('email', trans($response));

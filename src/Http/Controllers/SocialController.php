@@ -2,6 +2,7 @@
 
 namespace Devdojo\Auth\Http\Controllers;
 
+use Devdojo\Auth\Helper;
 use Devdojo\Auth\Models\SocialProvider;
 use Devdojo\Auth\Models\SocialProviderUser;
 use Illuminate\Http\RedirectResponse;
@@ -17,6 +18,7 @@ class SocialController
 
     public function redirect(Request $request, string $driver): RedirectResponse
     {
+        session()->put('auth.locale', Helper::currentLocale());
         $this->dynamicallySetSocialProviderCredentials($driver);
 
         return Socialite::driver($driver)->redirect();
@@ -59,9 +61,9 @@ class SocialController
 
             Auth::login($providerUser->user);
 
-            return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
+            return Helper::intendedRedirect(config('devdojo.auth.settings.redirect_after_auth'));
         } catch (\Exception $e) {
-            return redirect()->route('auth.login')->with('error', __('auth.social.authentication_error'));
+            return redirect(Helper::authUrl('auth.login'))->with('error', __('auth.social.authentication_error'));
         }
     }
 
@@ -79,14 +81,16 @@ class SocialController
 
         // If no existing user and registrations are disabled, reject the request
         if (! $user && ! config('devdojo.auth.settings.registration_enabled', true)) {
-            return redirect()->route('auth.login')->with('error', __('auth.register.registrations_disabled'));
+            return redirect(Helper::authUrl('auth.login'))->with('error', __('auth.register.registrations_disabled'));
         }
 
         if ($user) {
             $existingProvider = $user->socialProviders()->first();
             if ($existingProvider) {
-                return redirect()->route('auth.login')->with('error',
-                    __('auth.social.email_associated_with_provider', ['provider' => $existingProvider->provider_slug]));
+                return redirect(Helper::authUrl('auth.login'))->with(
+                    'error',
+                    __('auth.social.email_associated_with_provider', ['provider' => $existingProvider->provider_slug])
+                );
             }
         }
 

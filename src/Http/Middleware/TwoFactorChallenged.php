@@ -3,6 +3,7 @@
 namespace Devdojo\Auth\Http\Middleware;
 
 use Closure;
+use Devdojo\Auth\Helper;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +17,7 @@ class TwoFactorChallenged
     public function handle(Request $request, Closure $next): Response
     {
         if (! session()->has('login.id')) {
-            return redirect()->route('auth.login');
+            return redirect(Helper::authUrl('auth.login'));
         }
 
         return $next($request);

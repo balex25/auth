@@ -3,6 +3,7 @@
 namespace Devdojo\Auth\Http\Middleware;
 
 use Closure;
+use Devdojo\Auth\Helper;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +17,7 @@ class TwoFactorEnabled
     public function handle(Request $request, Closure $next): Response
     {
         if (! config('devdojo.auth.settings.enable_2fa')) {
-            return redirect('/');
+            return redirect(Helper::localizedUrl('/'));
         }
 
         return $next($request);

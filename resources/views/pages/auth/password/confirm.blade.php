@@ -1,24 +1,28 @@
 <?php
 
-use function Laravel\Folio\{middleware, name};
-use Livewire\Volt\Component;
-use Livewire\Attributes\Validate;
+use Devdojo\Auth\Helper;
 use Devdojo\Auth\Traits\HasConfigs;
+use Livewire\Attributes\Validate;
+use Livewire\Volt\Component;
 
-if(!isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] != true) || !app()->isLocal()){
+use function Laravel\Folio\middleware;
+use function Laravel\Folio\name;
+
+if (! isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] != true) || ! app()->isLocal()) {
     middleware('auth');
 }
 
 name('password.confirm');
 
-new class extends Component
+new class() extends Component
 {
     use HasConfigs;
 
     #[Validate('required|current_password')]
     public $password = '';
 
-    public function mount(){
+    public function mount()
+    {
         $this->loadConfigs();
     }
 
@@ -28,7 +32,7 @@ new class extends Component
 
         session()->put('auth.password_confirmed_at', time());
 
-        return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
+        return Helper::intendedRedirect(config('devdojo.auth.settings.redirect_after_auth'));
     }
 };
 

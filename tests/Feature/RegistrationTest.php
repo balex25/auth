@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
+use Livewire\Livewire;
 
 beforeEach(function () {
     config()->set('devdojo.auth.settings.registration_enabled', true);
@@ -33,6 +34,22 @@ it('allows registration when enabled', function () {
 
     expect(Auth::check())->toBeTrue();
     expect(Auth::user()->email)->toBe('test@example.com');
+});
+
+it('keeps the current locale when registration redirects to verification', function () {
+    config()->set('app.locales', ['en', 'ru']);
+    app()->setLocale('ru');
+    config()->set('devdojo.auth.settings.registration_require_email_verification', true);
+    config()->set('devdojo.auth.settings.registration_show_password_same_screen', true);
+
+    Livewire::withHeaders([
+        'Referer' => 'http://localhost/en/auth/register',
+    ])->test('auth.register')
+        ->set('email', 'english@example.com')
+        ->set('password', 'password123')
+        ->set('name', 'English User')
+        ->call('register')
+        ->assertRedirect(url('/en/auth/verify'));
 });
 
 it('preserves other registration settings when enabled', function () {

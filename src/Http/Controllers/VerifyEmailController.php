@@ -2,6 +2,7 @@
 
 namespace Devdojo\Auth\Http\Controllers;
 
+use Devdojo\Auth\Helper;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
@@ -14,13 +15,21 @@ class VerifyEmailController
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth').'?verified=1');
+            return Helper::intendedRedirect(self::verifiedRedirectTarget());
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth').'?verified=1');
+        return Helper::intendedRedirect(self::verifiedRedirectTarget());
+    }
+
+    private static function verifiedRedirectTarget(): string
+    {
+        $target = Helper::localizedRedirectTarget(config('devdojo.auth.settings.redirect_after_auth'));
+        $separator = str_contains($target, '?') ? '&' : '?';
+
+        return $target.$separator.'verified=1';
     }
 }

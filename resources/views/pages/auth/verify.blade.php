@@ -1,19 +1,23 @@
 <?php
 
+use Devdojo\Auth\Helper;
+use Devdojo\Auth\Traits\HasConfigs;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
-use Devdojo\Auth\Traits\HasConfigs;
-use function Laravel\Folio\{middleware, name};
 use Livewire\Volt\Component;
 
-//middleware(['auth', 'throttle:6,1']);
+use function Laravel\Folio\middleware;
+use function Laravel\Folio\name;
+
+// middleware(['auth', 'throttle:6,1']);
 name('verification.notice');
 
-new class extends Component
+new class() extends Component
 {
     use HasConfigs;
 
-    public function mount(){
+    public function mount()
+    {
         $this->loadConfigs();
     }
 
@@ -21,7 +25,7 @@ new class extends Component
     {
         $user = auth()->user();
         if ($user->hasVerifiedEmail()) {
-            redirect('/');
+            redirect(Helper::localizedUrl('/'));
         }
 
         $user->sendEmailVerificationNotification();
@@ -67,7 +71,7 @@ new class extends Component
                 <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-gray-500 underline cursor-pointer dark:text-neutral-400 dark:hover:text-neutral-300 hover:text-gray-800">
                   {{ $language->verify->logout }}
                 </button>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                <form id="logout-form" action="{{ Helper::authUrl('logout') }}" method="POST" style="display: none;">
                     @csrf
                 </form>
             </div>

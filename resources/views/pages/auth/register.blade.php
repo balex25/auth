@@ -1,5 +1,6 @@
 <?php
 
+use Devdojo\Auth\Helper;
 use Devdojo\Auth\Rules\PasswordStrength;
 use Devdojo\Auth\Traits\HasConfigs;
 use Illuminate\Auth\Events\Registered;
@@ -16,7 +17,7 @@ if (! isset($_GET['preview']) || (isset($_GET['preview']) && $_GET['preview'] !=
 
 name('auth.register');
 
-new class extends Component
+new class() extends Component
 {
     use HasConfigs;
 
@@ -65,7 +66,7 @@ new class extends Component
 
         if (! $this->settings->registration_enabled) {
             session()->flash('error', __('auth.register.registrations_disabled'));
-            redirect()->route('auth.login');
+            redirect(Helper::authUrl('auth.login'));
 
             return;
         }
@@ -98,13 +99,13 @@ new class extends Component
         if (! $this->settings->registration_enabled) {
             session()->flash('error', __('auth.register.registrations_disabled'));
 
-            return redirect()->route('auth.login');
+            return redirect(Helper::authUrl('auth.login'));
         }
 
         if (! $this->settings->enable_email_registration) {
             session()->flash('error', __('auth.register.email_registration_disabled'));
 
-            return redirect()->route('auth.register');
+            return redirect(Helper::authUrl('auth.register'));
         }
 
         if (! $this->showPasswordField) {
@@ -142,16 +143,17 @@ new class extends Component
         Auth::login($user, true);
 
         if (config('devdojo.auth.settings.registration_require_email_verification')) {
-            return redirect()->route('verification.notice');
+            return redirect(Helper::authUrl('verification.notice'));
         }
 
-        if (session()->get('url.intended') != route('logout.get')) {
+        if (session()->get('url.intended') != Helper::authUrl('logout.get')) {
             session()->regenerate();
-            return redirect()->intended(config('devdojo.auth.settings.redirect_after_auth'));
+
+            return Helper::intendedRedirect(config('devdojo.auth.settings.redirect_after_auth'));
         } else {
             session()->regenerate();
 
-            return redirect(config('devdojo.auth.settings.redirect_after_auth'));
+            return redirect(Helper::localizedRedirectTarget(config('devdojo.auth.settings.redirect_after_auth')));
         }
     }
 };

@@ -2,6 +2,8 @@
 
 namespace Devdojo\Auth;
 
+use Illuminate\Http\RedirectResponse;
+
 class Helper
 {
     // Build your next great package.
@@ -41,7 +43,7 @@ class Helper
     public static function authUrl(string $routeName, array $parameters = [], bool $preserveQuery = false): string
     {
         $url = route($routeName, $parameters);
-        $locale = self::currentLocaleSegment();
+        $locale = self::currentLocale();
 
         if ($locale !== null) {
             $url = self::prefixUrlPath($url, $locale);
@@ -57,7 +59,7 @@ class Helper
     public static function localizedUrl(string $path, bool $preserveQuery = false): string
     {
         $url = url($path);
-        $locale = self::currentLocaleSegment();
+        $locale = self::currentLocale();
 
         if ($locale !== null) {
             $url = self::prefixUrlPath($url, $locale);
@@ -70,7 +72,19 @@ class Helper
         return $url;
     }
 
-    private static function currentLocaleSegment(): ?string
+    public static function localizedRedirectTarget(string $target): string
+    {
+        $targetHost = parse_url($target, PHP_URL_HOST);
+        $applicationHost = parse_url(config('app.url'), PHP_URL_HOST);
+
+        if (is_string($targetHost) && $targetHost !== '' && $targetHost !== $applicationHost) {
+            return $target;
+        }
+
+        return self::localizedUrl($target);
+    }
+
+    public static function currentLocale(): ?string
     {
         $locales = config('app.locales', []);
         $locale = request()->segment(1);
@@ -91,6 +105,12 @@ class Helper
             return $refererLocale;
         }
 
+        $sessionLocale = session()->get('auth.locale');
+
+        if (is_string($sessionLocale) && in_array($sessionLocale, $locales, true)) {
+            return $sessionLocale;
+        }
+
         $applicationLocale = app()->getLocale();
 
         if (in_array($applicationLocale, $locales, true)) {
@@ -98,6 +118,11 @@ class Helper
         }
 
         return null;
+    }
+
+    public static function intendedRedirect(string $default): RedirectResponse
+    {
+        return redirect()->intended(self::localizedRedirectTarget($default));
     }
 
     private static function localeFromUrl(?string $url, array $locales): ?string

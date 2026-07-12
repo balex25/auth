@@ -28,3 +28,23 @@ it('falls back to the application locale without a localized request or referrer
     expect(Helper::localizedUrl('auth/register'))
         ->toEndWith('/ru/auth/register');
 });
+
+it('localizes relative and same-origin redirect targets', function () {
+    config()->set('app.url', 'https://beamngmods.test');
+    config()->set('app.locales', ['en', 'ru']);
+    app()->instance('request', Request::create('/en/auth/register'));
+
+    expect(Helper::localizedRedirectTarget('/'))
+        ->toBe('https://beamngmods.test/en')
+        ->and(Helper::localizedRedirectTarget('https://beamngmods.test/dashboard'))
+        ->toBe('https://beamngmods.test/en/dashboard');
+});
+
+it('does not modify external redirect targets', function () {
+    config()->set('app.url', 'https://beamngmods.test');
+    config()->set('app.locales', ['en', 'ru']);
+    app()->instance('request', Request::create('/en/auth/login'));
+
+    expect(Helper::localizedRedirectTarget('https://example.com/account'))
+        ->toBe('https://example.com/account');
+});
