@@ -11,6 +11,8 @@
 <div x-data="{
         focusedOrFilled: false,
         passwordVisible: false,
+        showPasswordLabel: @js(__('auth.passwordVisibility.show')),
+        hidePasswordLabel: @js(__('auth.passwordVisibility.hide')),
         focused(){ this.focusedOrFilled = true },
         blurred() {
             if (this.$refs.input.value == '') this.focusedOrFilled = false;
@@ -75,7 +77,7 @@
                         type="button"
                         x-on:click="passwordVisible = ! passwordVisible"
                         x-bind:aria-pressed="passwordVisible"
-                        x-bind:aria-label="passwordVisible ? @js(__('auth.passwordVisibility.hide')) : @js(__('auth.passwordVisibility.show'))"
+                        x-bind:aria-label="passwordVisible ? hidePasswordLabel : showPasswordLabel"
                         class="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center rounded-r-md text-gray-400 transition-colors hover:text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-600 dark:text-neutral-500 dark:hover:text-neutral-200 dark:focus-visible:ring-orange-500"
                     >
                         <svg x-show="! passwordVisible" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5" aria-hidden="true">

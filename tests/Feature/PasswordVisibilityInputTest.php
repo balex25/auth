@@ -9,6 +9,7 @@ it('renders a visibility toggle for password inputs', function () {
         ->toContain("x-bind:type=\"passwordVisible ? 'text' : 'password'\"")
         ->toContain('passwordVisible = ! passwordVisible')
         ->toContain('x-bind:aria-pressed="passwordVisible"')
+        ->toContain('passwordVisible ? hidePasswordLabel : showPasswordLabel')
         ->toContain('auth.passwordVisibility.show')
         ->toContain('auth.passwordVisibility.hide');
 });
