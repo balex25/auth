@@ -197,8 +197,8 @@ new class extends Component
         </form>
         @endif
 
-        <div class="@if(config('devdojo.auth.settings.social_providers_location') != 'top' && $showEmailRegistration){{ 'mt-3' }}@endif space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-            <span class="opacity-47 dark:text-white">{{ $language->register->already_have_an_account }}</span>
+        <div class="@if(config('devdojo.auth.settings.social_providers_location') != 'top' && $showEmailRegistration){{ 'mt-3' }}@endif space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif">
+            <span class="opacity-47 text-white">{{ $language->register->already_have_an_account }}</span>
             <x-auth::elements.text-link data-auth="login-link" href="{{ \Devdojo\Auth\Helper::authUrl('auth.login', [], true) }}">{{ $language->register->sign_in }}</x-auth::elements.text-link>
         </div>
 

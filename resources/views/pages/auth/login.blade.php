@@ -158,7 +158,7 @@ new class extends Component
 
                 @if($showPasswordField)
                     <x-auth::elements.input-placeholder value="{{ $email }}">
-                        <button type="button" data-auth="edit-email-button" wire:click="editIdentity" class="font-medium text-blue-500">{{ $language->login->edit }}</button>
+                        <button type="button" data-auth="edit-email-button" wire:click="editIdentity" class="font-medium text-orange-600 dark:text-orange-500">{{ $language->login->edit }}</button>
                     </x-auth::elements.input-placeholder>
                 @else
                     @if($showIdentifierInput)
@@ -199,8 +199,8 @@ new class extends Component
 
 
             @if(config('devdojo.auth.settings.registration_enabled', true))
-                <div class="mt-3 space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-                    <span class="opacity-47 dark:text-white"> {{ $language->login->dont_have_an_account }} </span>
+                <div class="mt-3 space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif">
+                    <span class="opacity-47 text-white"> {{ $language->login->dont_have_an_account }} </span>
                     <x-auth::elements.text-link data-auth="register-link" href="{{ \Devdojo\Auth\Helper::authUrl('auth.register', [], true) }}">{{ $language->login->sign_up }}</x-auth::elements.text-link>
                 </div>
             @endif
