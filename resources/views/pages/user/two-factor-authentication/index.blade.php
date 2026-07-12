@@ -1,19 +1,24 @@
 <?php
 
-use function Laravel\Folio\{middleware, name};
-use Livewire\Volt\Component;
-use Livewire\Attributes\On;
-use Livewire\Attributes\Validate;
-use PragmaRX\Google2FA\Google2FA;
 use Devdojo\Auth\Actions\TwoFactorAuth\DisableTwoFactorAuthentication;
 use Devdojo\Auth\Actions\TwoFactorAuth\GenerateNewRecoveryCodes;
 use Devdojo\Auth\Actions\TwoFactorAuth\GenerateQrCodeAndSecretKey;
+use Devdojo\Auth\Traits\HasConfigs;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Validate;
+use Livewire\Volt\Component;
+use PragmaRX\Google2FA\Google2FA;
+
+use function Laravel\Folio\middleware;
+use function Laravel\Folio\name;
 
 name('user.two-factor-authentication');
 middleware(['auth', 'verified', 'two-factor-enabled']);
 
-new class extends Component
+new class() extends Component
 {
+    use HasConfigs;
+
     public $enabled = false;
 
     // confirmed means that it has been enabled and the user has confirmed a code
@@ -21,49 +26,59 @@ new class extends Component
 
     public $showRecoveryCodes = true;
 
-    #[Validate('required|min:6')] 
+    #[Validate('required|min:6')]
     public $auth_code;
 
     public $secret = '';
+
     public $codes = '';
+
     public $qr = '';
-    
-    public function mount(){
-        if(is_null(auth()->user()->two_factor_confirmed_at)) {
+
+    public function mount()
+    {
+        $this->loadConfigs();
+
+        if (is_null(auth()->user()->two_factor_confirmed_at)) {
             app(DisableTwoFactorAuthentication::class)(auth()->user());
         } else {
             $this->confirmed = true;
         }
     }
 
-    public function enable(){
+    public function enable()
+    {
 
         $QrCodeAndSecret = new GenerateQrCodeAndSecretKey();
         [$this->qr, $this->secret] = $QrCodeAndSecret(auth()->user());
-        
+
         auth()->user()->forceFill([
             'two_factor_secret' => encrypt($this->secret),
-            'two_factor_recovery_codes' => encrypt(json_encode($this->generateCodes()))
+            'two_factor_recovery_codes' => encrypt(json_encode($this->generateCodes())),
         ])->save();
 
         $this->enabled = true;
     }
 
-    private function generateCodes(){
+    private function generateCodes()
+    {
         $generateCodesFor = new GenerateNewRecoveryCodes();
+
         return $generateCodesFor(auth()->user());
     }
 
-    public function regenerateCodes(){
+    public function regenerateCodes()
+    {
         auth()->user()->forceFill([
-            'two_factor_recovery_codes' => encrypt(json_encode($this->generateCodes()))
+            'two_factor_recovery_codes' => encrypt(json_encode($this->generateCodes())),
         ])->save();
     }
 
-    public function cancelTwoFactor(){
+    public function cancelTwoFactor()
+    {
         auth()->user()->forceFill([
             'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null
+            'two_factor_recovery_codes' => null,
         ])->save();
 
         $this->enabled = false;
@@ -78,43 +93,43 @@ new class extends Component
         $google2fa = new Google2FA();
         $valid = $google2fa->verifyKey($this->secret, $code);
 
-        if($valid){
+        if ($valid) {
             auth()->user()->forceFill([
                 'two_factor_confirmed_at' => now(),
             ])->save();
 
             $this->confirmed = true;
         } else {
-            $this->addError('auth_code', 'Invalid authentication code. Please try again.');
+            $this->addError('auth_code', $this->language->twoFactorSetup->invalid_code);
         }
     }
 
-    public function disable(){
-        $disable = new DisableTwoFactorAuthentication;
+    public function disable()
+    {
+        $disable = new DisableTwoFactorAuthentication();
         $disable(auth()->user());
 
         $this->enabled = false;
         $this->confirmed = false;
         $this->showRecoveryCodes = true;
     }
-
 }
 
 ?>
 
-<x-auth::layouts.empty title="Two Factor Authentication">
+<x-auth::layouts.empty :title="$language->twoFactorSetup->page_title">
     @volt('user.two-factor-authentication')
-        <section class="flex @container justify-center items-center w-screen h-screen">
+        <section class="flex min-h-dvh w-full @container items-center justify-center bg-white px-6 py-10 text-gray-900 dark:bg-zinc-900 dark:text-gray-100">
 
             <div x-data x-on:code-input-complete.window="$dispatch('submitCode', [event.detail.code])" class="flex flex-col w-full max-w-sm mx-auto text-sm">
                 @if($confirmed)
                     <div class="flex flex-col space-y-5">
-                        <h2 class="text-xl">You have enabled two factor authentication.</h2>
-                        <p>When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application.</p>    
+                        <h2 class="text-xl font-semibold">{{ $language->twoFactorSetup->enabled_title }}</h2>
+                        <p>{{ $language->twoFactorSetup->enabled_description }}</p>
                         @if($showRecoveryCodes)
                             <div class="relative">
-                                <p class="font-medium">Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.</p>
-                                <div class="grid max-w-xl gap-1 px-4 py-4 mt-4 font-mono text-sm bg-gray-100 rounded-lg dark:bg-gray-900 dark:text-gray-100">
+                                <p class="font-medium">{{ $language->twoFactorSetup->recovery_codes_description }}</p>
+                                <div class="grid max-w-xl gap-1 px-4 py-4 mt-4 font-mono text-sm bg-gray-100 text-gray-900 rounded-lg dark:bg-gray-900 dark:text-gray-100">
                                     
                                     @foreach (json_decode(decrypt(auth()->user()->two_factor_recovery_codes), true) as $code)
                                         <div>{{ $code }}</div>
@@ -123,26 +138,26 @@ new class extends Component
                             </div>
                         @endif
                         <div class="flex items-center space-x-5">
-                            <x-auth::elements.button type="primary" wire:click="regenerateCodes" rounded="md" size="md">Regenerate Codes</x-auth::elements.button>
-                            <x-auth::elements.button type="danger" wire:click="disable" size="md" rounded="md">Disable 2FA</x-auth::elements.button>
+                            <x-auth::elements.button type="primary" wire:click="regenerateCodes" rounded="md" size="md">{{ $language->twoFactorSetup->regenerate_codes }}</x-auth::elements.button>
+                            <x-auth::elements.button type="danger" wire:click="disable" size="md" rounded="md">{{ $language->twoFactorSetup->disable }}</x-auth::elements.button>
                         </div>
                     </div>
                     
                 @else
                     @if(!$enabled)
                         <div class="relative flex flex-col items-start justify-start space-y-5">
-                            <h2 class="text-lg font-semibold">Two factor authentication disabled.</h2>
-                            <p class="-translate-y-1">When you enabled 2FA, you will be prompted for a secure code during authentication. This code can be retrieved from your phone's Google Authenticator application.</p>
+                            <h2 class="text-lg font-semibold">{{ $language->twoFactorSetup->disabled_title }}</h2>
+                            <p class="-translate-y-1">{{ $language->twoFactorSetup->disabled_description }}</p>
                             <div class="relative w-auto">
-                                <x-auth::elements.button type="primary" data-auth="enable-button" rounded="md" size="md" wire:click="enable" wire:target="enable">Enable</x-auth>
+                                <x-auth::elements.button type="primary" data-auth="enable-button" rounded="md" size="md" wire:click="enable" wire:target="enable">{{ $language->twoFactorSetup->enable }}</x-auth::elements.button>
                             </div>
                         </div>
                     @else
                         <div  class="relative w-full space-y-5">
                             <div class="space-y-5">
-                                <h2 class="text-lg font-semibold">Finish enabling two factor authentication.</h2>
-                                <p>Enable two-factor authentication to receive a secure token from your phone's Google Authenticator during login.</p>
-                                <p class="font-bold">To enable two-factor authentication, scan the QR code or enter the setup key using your phone's authenticator app and provide the OTP code.</p>
+                                <h2 class="text-lg font-semibold">{{ $language->twoFactorSetup->finish_title }}</h2>
+                                <p>{{ $language->twoFactorSetup->finish_description }}</p>
+                                <p class="font-bold">{{ $language->twoFactorSetup->finish_instructions }}</p>
                             </div>
 
                             <div class="relative max-w-full mx-auto overflow-hidden border rounded-lg border-zinc-200">
@@ -150,17 +165,17 @@ new class extends Component
                             </div>
 
                             <p class="font-semibold text-center">
-                                {{ __('Setup Key') }}: {{ $secret }}
+                                {{ $language->twoFactorSetup->setup_key }}: {{ $secret }}
                             </p>
 
-                            <x-auth::elements.input-code id="auth-input-code" digits="6" eventCallback="code-input-complete" type="text" label="Code" />
+                            <x-auth::elements.input-code id="auth-input-code" digits="6" eventCallback="code-input-complete" type="text" :label="$language->twoFactorSetup->code" />
                             @error('auth_code')
                                 <p class="my-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                             
                             <div class="flex items-center space-x-5">
-                                <x-auth::elements.button type="secondary" size="md" rounded="md" wire:click="cancelTwoFactor" wire:target="cancelTwoFactor">Cancel</x-auth::elements.button>
-                                <x-auth::elements.button type="primary" size="md" wire:click="submitCode(document.getElementById('auth-input-code').value)" wire:target="submitCode" rounded="md">Confirm</x-auth::elements.button>
+                                <x-auth::elements.button type="secondary" size="md" rounded="md" wire:click="cancelTwoFactor" wire:target="cancelTwoFactor">{{ $language->twoFactorSetup->cancel }}</x-auth::elements.button>
+                                <x-auth::elements.button type="primary" size="md" wire:click="submitCode(document.getElementById('auth-input-code').value)" wire:target="submitCode" rounded="md">{{ $language->twoFactorSetup->confirm }}</x-auth::elements.button>
                             </div>
 
                         </div>
