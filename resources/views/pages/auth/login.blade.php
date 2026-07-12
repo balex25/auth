@@ -111,6 +111,7 @@ new class() extends Component
             // Fire Failed event manually
             event(new Failed('web', null, $credentials));
             $this->addError('password', trans('auth.failed'));
+            $this->resetTurnstile();
 
             return;
         }
@@ -119,6 +120,7 @@ new class() extends Component
 
         if (! isset($userAttemptingLogin->id)) {
             $this->addError('password', trans('auth.failed'));
+            $this->resetTurnstile();
 
             return;
         }
@@ -135,6 +137,7 @@ new class() extends Component
             if (! Auth::attempt($credentials, $this->rememberMe)) {
                 event(new Failed('web', null, $credentials)); // Fire Failed Attempt
                 $this->addError('password', trans('auth.failed'));
+                $this->resetTurnstile();
 
                 return;
             }

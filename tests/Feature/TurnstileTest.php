@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
@@ -35,13 +37,19 @@ it('verifies the token through the configured Cloudflare endpoint', function () 
         ]),
     ]);
 
+    $user = User::factory()->create([
+        'password' => Hash::make('password123'),
+    ]);
+
     Livewire::test('auth.login')
         ->set('showPasswordField', true)
-        ->set('email', 'person@example.com')
-        ->set('password', 'password')
+        ->set('email', $user->email)
+        ->set('password', 'password123')
         ->set('turnstileToken', 'verified-token')
         ->call('authenticate')
-        ->assertHasNoErrors(['turnstileToken']);
+        ->assertHasNoErrors(['turnstileToken'])
+        ->assertRedirect()
+        ->assertNotDispatched('auth-turnstile-reset');
 
     Http::assertSent(fn ($request): bool => $request->url() === 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
         && $request['secret'] === 'turnstile-secret-key'

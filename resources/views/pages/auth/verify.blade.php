@@ -35,6 +35,7 @@ new class() extends Component
         $user->sendEmailVerificationNotification();
 
         event(new Verified($user));
+        $this->resetTurnstile();
 
         $this->dispatch('resent');
         session()->flash('resent');

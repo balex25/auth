@@ -47,13 +47,17 @@ trait ValidatesTurnstile
         }
 
         $this->turnstileToken = null;
+    }
+
+    protected function resetTurnstile(): void
+    {
+        $this->turnstileToken = null;
         $this->dispatch('auth-turnstile-reset');
     }
 
     private function rejectTurnstile(string $message): never
     {
-        $this->turnstileToken = null;
-        $this->dispatch('auth-turnstile-reset');
+        $this->resetTurnstile();
 
         throw ValidationException::withMessages([
             'turnstileToken' => $message,

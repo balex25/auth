@@ -39,6 +39,7 @@ new class() extends Component
         }
 
         $this->addError('email', trans($response));
+        $this->resetTurnstile();
     }
 };
 

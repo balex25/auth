@@ -67,6 +67,7 @@ new class() extends Component
             $this->loginUser($user);
         } else {
             $this->addError('auth_code', __('auth.twoFactorChallenge.invalid_auth_code'));
+            $this->resetTurnstile();
         }
 
     }
@@ -83,6 +84,7 @@ new class() extends Component
             return $this->loginUser($user);
         } else {
             $this->addError('recovery_code', __('auth.twoFactorChallenge.invalid_recovery_code'));
+            $this->resetTurnstile();
         }
     }
 
