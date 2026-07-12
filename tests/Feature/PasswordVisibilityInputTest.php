@@ -10,8 +10,6 @@ it('renders a visibility toggle for password inputs', function () {
         ->toContain('passwordVisible = ! passwordVisible')
         ->toContain('x-bind:aria-pressed="passwordVisible"')
         ->toContain('passwordVisible ? hidePasswordLabel : showPasswordLabel')
-        ->toContain('lucide-eye-icon lucide-eye')
-        ->toContain('lucide-eye-off-icon lucide-eye-off')
         ->toContain('auth.passwordVisibility.show')
         ->toContain('auth.passwordVisibility.hide');
 });

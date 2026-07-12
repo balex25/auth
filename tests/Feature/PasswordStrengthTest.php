@@ -183,7 +183,9 @@ it('shows password requirements on registration page when enabled', function () 
     $response = $this->get(route('auth.register'));
 
     $response->assertOk();
-    $response->assertSee('Be at least 10 characters');
+    $response->assertSee('At least 10 characters');
+    $response->assertSee('meetsPasswordRequirements()', false);
+    $response->assertSee('M20 6 9 17l-5-5', false);
 });
 
 it('hides password requirements when disabled', function () {
@@ -194,7 +196,7 @@ it('hides password requirements when disabled', function () {
     $response = $this->get(route('auth.register'));
 
     $response->assertOk();
-    $response->assertDontSee('Be at least 10 characters');
+    $response->assertDontSee('At least 10 characters');
 });
 
 it('shows uppercase requirement when enabled', function () {
@@ -205,7 +207,8 @@ it('shows uppercase requirement when enabled', function () {
     $response = $this->get(route('auth.register'));
 
     $response->assertOk();
-    $response->assertSee('Include uppercase and lowercase letters');
+    $response->assertSee('One lowercase character');
+    $response->assertSee('One uppercase character');
 });
 
 it('shows numeric requirement when enabled', function () {
@@ -216,7 +219,7 @@ it('shows numeric requirement when enabled', function () {
     $response = $this->get(route('auth.register'));
 
     $response->assertOk();
-    $response->assertSee('Include at least one number');
+    $response->assertSee('One number');
 });
 
 it('shows special character requirement when enabled', function () {
@@ -227,5 +230,5 @@ it('shows special character requirement when enabled', function () {
     $response = $this->get(route('auth.register'));
 
     $response->assertOk();
-    $response->assertSee('Include at least one special character');
+    $response->assertSee('One special character');
 });

@@ -190,8 +190,7 @@ new class() extends Component
             @endif
 
             @if($showPasswordField)
-           <x-auth::elements.input :label="$language->register->password" type="password" wire:model="password" id="password" name="password" data-auth="password-input" autocomplete="new-password" required />
-            <x-auth::elements.password-requirements />
+           <x-auth::elements.input :label="$language->register->password" type="password" wire:model="password" id="password" name="password" data-auth="password-input" autocomplete="new-password" :show-requirements="true" required />
             @endif
 
             @if($showPasswordConfirmationField)

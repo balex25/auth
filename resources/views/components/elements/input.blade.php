@@ -4,18 +4,53 @@
     'name' => null,
     'type' => 'text',
     'autofocus' => false,
+    'showRequirements' => false,
 ])
 
 @php $wireModel = $attributes->get('wire:model'); @endphp
+@php
+    $minimumPasswordLength = (int) config('devdojo.auth.settings.password_min_length', 8);
+    $requiresMixedCase = (bool) config('devdojo.auth.settings.password_require_uppercase', false);
+    $requiresNumber = (bool) config('devdojo.auth.settings.password_require_numeric', false);
+    $requiresSymbol = (bool) config('devdojo.auth.settings.password_require_special_character', false);
+    $displaysPasswordRequirements = $type === 'password'
+        && $showRequirements
+        && config('devdojo.auth.settings.password_show_requirements', true);
+@endphp
 
 <div x-data="{
         focusedOrFilled: false,
         passwordVisible: false,
+        passwordValue: '',
+        requirementsOpen: false,
+        minimumPasswordLength: @js($minimumPasswordLength),
+        requiresMixedCase: @js($requiresMixedCase),
+        requiresNumber: @js($requiresNumber),
+        requiresSymbol: @js($requiresSymbol),
+        meetsMinimumLength() { return this.passwordValue.length >= this.minimumPasswordLength },
+        includesLowercase() { return /[a-z]/.test(this.passwordValue) },
+        includesUppercase() { return /[A-Z]/.test(this.passwordValue) },
+        includesNumber() { return /[0-9]/.test(this.passwordValue) },
+        includesSymbol() { return /[^A-Za-z0-9]/.test(this.passwordValue) },
+        meetsPasswordRequirements() {
+            return this.meetsMinimumLength()
+                && (! this.requiresMixedCase || (this.includesLowercase() && this.includesUppercase()))
+                && (! this.requiresNumber || this.includesNumber())
+                && (! this.requiresSymbol || this.includesSymbol());
+        },
         showPasswordLabel: @js(__('auth.passwordVisibility.show')),
         hidePasswordLabel: @js(__('auth.passwordVisibility.hide')),
-        focused(){ this.focusedOrFilled = true },
+        focused(){
+            this.focusedOrFilled = true;
+            @if($displaysPasswordRequirements)
+                this.requirementsOpen = true;
+            @endif
+        },
         blurred() {
             if (this.$refs.input.value == '') this.focusedOrFilled = false;
+            setTimeout(() => {
+                if (! this.$el.contains(document.activeElement)) this.requirementsOpen = false;
+            }, 0);
         }
     }"
     x-init="
@@ -23,7 +58,10 @@
             setTimeout(function(){ $refs.input.focus(); }, 1);
         @endif
         // if input already has value on load, keep label floated:
-        setTimeout(() => { if ($refs.input.value !== '') focusedOrFilled = true }, 1);
+        setTimeout(() => {
+            passwordValue = $refs.input.value;
+            if ($refs.input.value !== '') focusedOrFilled = true;
+        }, 1);
     "
     class="w-full h-auto"
 >
@@ -62,7 +100,10 @@
                     x-ref="input"
                     @focus="focused()"
                     @blur="blurred()"
-                    class="auth-component-input appearance-none flex w-full h-11 {{ $type === 'password' ? 'pr-11 pl-3.5' : 'px-3.5' }} text-sm rounded-md
+                    @if ($type === 'password')
+                        @input="passwordValue = $el.value"
+                    @endif
+                    class="auth-component-input appearance-none flex w-full h-11 {{ $type === 'password' ? ($displaysPasswordRequirements ? 'pr-[5.5rem] pl-3.5' : 'pr-11 pl-3.5') : 'px-3.5' }} text-sm rounded-md
                            bg-gray-800 dark:bg-black text-gray-100 dark:text-white
                            border border-gray-600
                            placeholder:text-gray-400 dark:placeholder:text-neutral-500
@@ -73,6 +114,61 @@
                 />
 
                 @if ($type === 'password')
+                    @if ($displaysPasswordRequirements)
+                        <button
+                            type="button"
+                            x-on:click="requirementsOpen = ! requirementsOpen"
+                            x-bind:aria-expanded="requirementsOpen"
+                            aria-label="{{ __('Password requirements') }}"
+                            class="absolute inset-y-0 right-11 inline-flex w-11 items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-600 dark:focus-visible:ring-orange-500"
+                            x-bind:class="meetsPasswordRequirements() ? 'text-green-500' : 'text-red-500'"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                        </button>
+
+                        <div
+                            x-show="requirementsOpen"
+                            x-cloak
+                            x-transition:enter="transition ease-out duration-150"
+                            x-transition:enter-start="opacity-0 translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-100"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 translate-y-1"
+                            class="absolute top-full right-0 z-30 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-3 text-xs shadow-xl dark:border-neutral-700 dark:bg-neutral-900"
+                        >
+                            <p class="mb-2 font-medium text-gray-700 dark:text-neutral-200">{{ __('Password must contain:') }}</p>
+                            <ul class="space-y-1.5 text-gray-600 dark:text-neutral-400">
+                                <li class="flex items-center gap-2" x-bind:class="meetsMinimumLength() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                                    <span>{{ trans_choice('At least :count character|At least :count characters', $minimumPasswordLength, ['count' => $minimumPasswordLength]) }}</span>
+                                </li>
+                                @if ($requiresMixedCase)
+                                    <li class="flex items-center gap-2" x-bind:class="includesLowercase() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                                        <span>{{ __('One lowercase character') }}</span>
+                                    </li>
+                                    <li class="flex items-center gap-2" x-bind:class="includesUppercase() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                                        <span>{{ __('One uppercase character') }}</span>
+                                    </li>
+                                @endif
+                                @if ($requiresNumber)
+                                    <li class="flex items-center gap-2" x-bind:class="includesNumber() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                                        <span>{{ __('One number') }}</span>
+                                    </li>
+                                @endif
+                                @if ($requiresSymbol)
+                                    <li class="flex items-center gap-2" x-bind:class="includesSymbol() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                                        <span>{{ __('One special character') }}</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </div>
+                    @endif
+
                     <button
                         type="button"
                         x-on:click="passwordVisible = ! passwordVisible"
@@ -80,11 +176,11 @@
                         x-bind:aria-label="passwordVisible ? hidePasswordLabel : showPasswordLabel"
                         class="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center rounded-r-md text-gray-400 transition-colors hover:text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-600 dark:text-neutral-500 dark:hover:text-neutral-200 dark:focus-visible:ring-orange-500"
                     >
-                        <svg x-show="! passwordVisible" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye" aria-hidden="true">
+                        <svg x-show="! passwordVisible" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true">
                             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
                             <circle cx="12" cy="12" r="3" />
                         </svg>
-                        <svg x-show="passwordVisible" x-cloak xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off-icon lucide-eye-off" aria-hidden="true">
+                        <svg x-show="passwordVisible" x-cloak xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true">
                             <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
                             <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
                             <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
