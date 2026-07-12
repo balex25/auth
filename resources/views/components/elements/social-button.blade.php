@@ -14,5 +14,6 @@
             <span class="block w-full h-full rounded-full bg-zinc-200"></span>
         @endif
     </span>
-    <span>{{ __('auth.social.continue_with', ['provider' => $provider->name]) }}</span>
+    @php($providerTranslationKey = 'auth.social.providers.'.$slug)
+    <span>{{ __('auth.social.continue_with', ['provider' => trans()->has($providerTranslationKey) ? __($providerTranslationKey) : $provider->name]) }}</span>
 </a>
