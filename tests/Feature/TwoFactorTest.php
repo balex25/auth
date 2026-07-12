@@ -94,5 +94,6 @@ it('user can view two factor challenge page when it\'s enabled', function () {
     config()->set('devdojo.auth.settings.enable_2fa', true);
     $user = loginAsUser();
     $this->get('user/two-factor-authentication')
-        ->assertOk();
+        ->assertOk()
+        ->assertSee('auth.twoFactorSetup.disabled_title');
 });

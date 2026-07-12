@@ -117,7 +117,7 @@ new class() extends Component
 
 ?>
 
-<x-auth::layouts.empty :title="$language->twoFactorSetup->page_title">
+<x-auth::layouts.empty :title="__('auth.twoFactorSetup.page_title')">
     @volt('user.two-factor-authentication')
         <section class="flex min-h-dvh w-full @container items-center justify-center bg-white px-6 py-10 text-gray-900 dark:bg-zinc-900 dark:text-gray-100">
 
