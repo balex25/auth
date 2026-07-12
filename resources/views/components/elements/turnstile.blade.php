@@ -45,7 +45,19 @@
                     document.head.appendChild(script);
                 }
 
-                script.addEventListener('load', () => this.renderTurnstile(), { once: true });
+                if (script.dataset.loaded === 'true') {
+                    this.renderTurnstile();
+                    return;
+                }
+
+                script.addEventListener('load', () => {
+                    script.dataset.loaded = 'true';
+                    this.renderTurnstile();
+                }, { once: true });
+
+                script.addEventListener('error', () => {
+                    this.scriptRequested = false;
+                }, { once: true });
             },
             renderTurnstile() {
                 if (!window.turnstile || this.widgetId !== null) return;
@@ -53,7 +65,7 @@
                 this.widgetId = window.turnstile.render(this.$refs.widget, {
                     sitekey: this.siteKey,
                     action: this.action,
-                    appearance: 'interaction-only',
+                    appearance: 'always',
                     theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
                     callback: token => this.setToken(token),
                     'expired-callback': () => this.setToken(''),

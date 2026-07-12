@@ -15,7 +15,6 @@ it('routes internal auth navigation through locale-aware helpers', function () {
             $patterns = [
                 '/redirect\(\)->route\(/',
                 '/redirect\([\'\"]\/[\'\"]\)/',
-                '/action=\"\{\{ route\([\'\"]logout[\'\"]\) \}\}\"/',
             ];
 
             foreach ($patterns as $pattern) {

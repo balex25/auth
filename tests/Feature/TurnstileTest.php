@@ -8,12 +8,12 @@ beforeEach(function () {
     config()->set('services.turnstile.secret', 'turnstile-secret-key');
 });
 
-it('lazy loads an interaction-only Turnstile widget on auth pages', function () {
+it('lazy loads a visible Turnstile widget on auth pages', function () {
     Livewire::test('auth.login')
         ->set('showPasswordField', true)
         ->assertSee('turnstile-site-key')
         ->assertSee('api.js?render=explicit', false)
-        ->assertSee("appearance: 'interaction-only'", false)
+        ->assertSee("appearance: 'always'", false)
         ->assertSee('requestSubmit()', false)
         ->assertSee('auth_login');
 });

@@ -77,7 +77,7 @@ new class() extends Component
                 <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-gray-500 underline cursor-pointer dark:text-neutral-400 dark:hover:text-neutral-300 hover:text-gray-800">
                   {{ $language->verify->logout }}
                 </button>
-                <form id="logout-form" action="{{ Helper::authUrl('logout') }}" method="POST" style="display: none;">
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf
                 </form>
             </div>

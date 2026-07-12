@@ -21,6 +21,22 @@ it('logs out user via POST request', function () {
     expect(Auth::check())->toBeFalse();
 });
 
+it('uses the unprefixed POST action and preserves the current locale after logout', function () {
+    config()->set('app.locales', ['en', 'ru']);
+
+    $this->actingAs($this->user);
+
+    $route = app('router')->getRoutes()->getByName('logout');
+
+    expect($route)->not->toBeNull()
+        ->and($route->uri())->toBe('auth/logout')
+        ->and($route->methods())->toContain('POST');
+
+    $this->withHeader('Referer', url('/en/auth/verify'))
+        ->post(route('logout'))
+        ->assertRedirect(url('/en'));
+});
+
 it('logs out user via GET request', function () {
     $this->actingAs($this->user);
     expect(Auth::check())->toBeTrue();
