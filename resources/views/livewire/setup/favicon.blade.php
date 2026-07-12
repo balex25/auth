@@ -13,7 +13,7 @@
                     <img src="{{ url($favicon_light) . '?' . uniqid() }}" class="w-auto h-8 rounded-md" />
                 </div>
             @endif
-            <label for="favicon_light" class="flex overflow-hidden justify-start items-center mt-3 w-auto h-auto text-sm bg-gray-50 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-100">
+            <label for="favicon_light" class="flex overflow-hidden justify-start items-center mt-3 w-auto h-auto text-sm bg-gray-50 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700">
                 <div class="px-2 py-1.5 text-white bg-zinc-800">Upload</div>
                 <div class="px-3 py-1.5 text-zinc-500 group-hover:text-zinc-600">Choose an image</div>
                 <input id="favicon_light" type="file" wire:model="favicon_light" class="hidden" />
@@ -32,7 +32,7 @@
                     <img src="{{ url($favicon_dark) . '?' . uniqid() }}" class="w-auto h-8 rounded-md" />
                 </div>
             @endif
-            <label for="favicon_dark" class="flex overflow-hidden justify-start items-center mt-3 w-auto h-auto text-sm bg-gray-50 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-100">
+            <label for="favicon_dark" class="flex overflow-hidden justify-start items-center mt-3 w-auto h-auto text-sm bg-gray-50 rounded-md border border-gray-300 cursor-pointer hover:bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700">
                 <div class="px-2 py-1.5 text-white bg-zinc-800">Upload</div>
                 <div class="px-3 py-1.5 text-zinc-500 group-hover:text-zinc-600">Choose an image</div>
                 <input id="favicon_dark" type="file" wire:model="favicon_dark" class="hidden" />

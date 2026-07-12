@@ -57,7 +57,7 @@ new class extends Component
                 @endif
 
                 <div class="text-sm leading-6 text-gray-700 dark:text-neutral-400">
-                    <p>{{ $language->verify->description }} <a wire:click="resend" data-auth="verify-email-resend-link" class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer dark:text-neutral-300 hover:text-gray-600 focus:outline-hidden focus:underline">{{ $language->verify->new_request_link }}</a></p>
+                    <p>{{ $language->verify->description }} <a wire:click="resend" data-auth="verify-email-resend-link" class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer dark:text-neutral-300 hover:text-gray-600 dark:hover:text-neutral-200 focus:outline-hidden focus:underline">{{ $language->verify->new_request_link }}</a></p>
                 </div>
 
 

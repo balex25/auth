@@ -22,3 +22,24 @@ it('keeps gray utilities for light mode and neutral utilities for dark mode', fu
 
     expect($darkGrayUsages)->toBeEmpty();
 });
+
+it('provides dark interaction overrides for light gray interaction utilities', function () {
+    $files = File::allFiles(dirname(__DIR__, 2).'/resources/views');
+    $missingOverrides = [];
+
+    foreach ($files as $file) {
+        foreach (preg_split('/\R/', $file->getContents()) as $lineNumber => $line) {
+            preg_match_all('/(?<!dark:)(hover|focus|active):([a-z-]+)gray-\d+(?:\/\d+)?/', $line, $matches, PREG_SET_ORDER);
+
+            foreach ($matches as $match) {
+                $darkProperty = 'dark:'.$match[1].':'.$match[2];
+
+                if (! str_contains($line, $darkProperty)) {
+                    $missingOverrides[] = $file->getRelativePathname().':'.($lineNumber + 1).' '.$match[0];
+                }
+            }
+        }
+    }
+
+    expect($missingOverrides)->toBeEmpty();
+});

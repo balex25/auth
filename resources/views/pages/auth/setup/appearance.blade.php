@@ -96,10 +96,9 @@ new class extends Component
                                 <nav class="flex -mb-px space-x-8" aria-label="Tabs">
                                     @foreach($tabs as $slug => $tab)
                                         <a href="#_" @click.prevent="tab = '{{ $slug }}'" 
-                                            :class="{ 'border-indigo-500 text-indigo-600' : tab == '{{ $slug }}', 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' : tab != '{{ $slug }}' }"
+                                            :class="{ 'border-indigo-500 text-indigo-600' : tab == '{{ $slug }}', 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-neutral-400 dark:hover:border-neutral-600 dark:hover:text-neutral-200' : tab != '{{ $slug }}' }"
                                             class="px-1 py-4 text-sm font-medium whitespace-nowrap border-b-2">{{ $tab }}</a>
                                     @endforeach
-                                    <!-- Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
                                 </nav>
                                 </div>
                             </div>
