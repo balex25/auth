@@ -129,7 +129,7 @@ new class() extends Component
                         @if($showRecoveryCodes)
                             <div class="relative">
                                 <p class="font-medium">{{ $language->twoFactorSetup->recovery_codes_description }}</p>
-                                <div class="grid max-w-xl gap-1 px-4 py-4 mt-4 font-mono text-sm bg-gray-100 text-gray-900 rounded-lg dark:bg-neutral-900 dark:text-neutral-100">
+                                <div class="grid max-w-xl gap-1 px-4 py-4 mt-4 font-mono text-sm bg-gray-100 text-gray-900 rounded-lg dark:bg-zinc-800 dark:text-neutral-100">
                                     
                                     @foreach (json_decode(decrypt(auth()->user()->two_factor_recovery_codes), true) as $code)
                                         <div>{{ $code }}</div>

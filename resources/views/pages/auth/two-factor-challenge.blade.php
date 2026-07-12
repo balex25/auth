@@ -148,9 +148,9 @@ new class() extends Component
                     
                 </div>
 
-                <div class="mt-5 space-x-0.5 text-sm leading-5 text-left" style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-                    <span class="opacity-47">{{ $language->twoFactorChallenge->or_you_can }} </span>
-                    <span class="font-medium underline opacity-60 cursor-pointer" wire:click="switchToRecovery" href="#_">
+                <div class="mt-5 space-x-0.5 text-sm leading-5 text-left">
+                    <span class="opacity-47 text-white">{{ $language->twoFactorChallenge->or_you_can }} </span>
+                    <span class="font-semibold cursor-pointer text-orange-600 hover:text-orange-700 no-underline hover:underline transition-all" wire:click="switchToRecovery" href="#_">
                         @if(!$recovery)
                             <span>{{ $language->twoFactorChallenge->login_using_recovery_code }}</span>
                         @else
