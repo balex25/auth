@@ -10,10 +10,6 @@
     <meta name="robots" content="noindex, follow">
 @endif
 
-@if(file_exists(public_path('auth/custom-head.css')))
-    <link rel="stylesheet" href="/auth/custom-head.css" />
-@endif
-
 @if(config('devdojo.auth.settings.dev_mode'))
     @vite(['packages/devdojo/auth/resources/css/auth.css', 'packages/devdojo/auth/resources/css/auth.js'])
 @else

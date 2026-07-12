@@ -1,0 +1,195 @@
+.bng-separator[data-orientation="vertical"] {
+  width: 30px;
+	position: absolute;
+	top: -1px;
+	bottom: 0;
+	right: -30px;
+	z-index: 1;
+}
+
+.bng-separator[data-orientation="horizontal"] {
+  width: 100%;
+  height: 30px;
+  max-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.bng-separator path {
+	stroke-width: 2px;
+}
+
+.bng-separator circle {
+	stroke: none;
+}
+
+.bng-separator .bng-separator-connector {
+	fill: none;
+	stroke-width: 1px;
+}
+
+.bng-separator g:not(:last-child) .bng-separator-main {
+	stroke-width: 1px;
+}
+
+.bng-separator .bng-separator-main {
+	fill: #1f2937;
+	stroke: #888;
+}
+
+.bng-separator circle {
+	fill: #f60;
+}
+
+.bng-separator .bng-separator-main {
+	fill: #eee;
+}
+
+.bng-separator g:last-child .bng-separator-main {
+	fill: #1f2937;
+}
+
+.bng-separator g:nth-child(1) .bng-separator-main {
+	fill: #bbd0de;
+}
+
+.bng-separator g:nth-child(1) circle {
+	fill: #bbd0de;
+}
+
+.bng-separator g:nth-child(1) path {
+	stroke: rgba(255, 255, 255, 0.36);
+}
+
+.bng-separator g:nth-child(2) .bng-separator-main {
+	fill: #84aac3;
+}
+
+.bng-separator g:nth-child(2) circle {
+	fill: #84aac3;
+}
+
+.bng-separator g:nth-child(2) path {
+	stroke: rgba(235, 241, 245, 0.52);
+}
+
+.bng-separator g:nth-child(3) .bng-separator-main {
+	fill: #5184a4;
+}
+
+.bng-separator g:nth-child(3) circle {
+	fill: #5184a4;
+}
+
+.bng-separator g:nth-child(3) path {
+	stroke: rgba(180, 203, 218, 0.68);
+}
+
+.bng-separator g:nth-child(4) .bng-separator-main {
+	fill: #36586e;
+}
+
+.bng-separator g:nth-child(4) circle {
+	fill: #36586e;
+}
+
+.bng-separator g:nth-child(4) path {
+	stroke: rgba(125, 165, 191, 0.84);
+}
+
+.bng-separator g:nth-child(5) .bng-separator-main {
+	fill: #1f2937;
+}
+
+.bng-separator g:nth-child(5) circle {
+	fill: #1f2937;
+}
+
+.bng-separator g:nth-child(5) path {
+	stroke: #4d7e9e;
+}
+
+.bng-separator g:last-child circle {
+	fill: #f60;
+}
+
+
+/* Dark mode */
+.dark .bng-separator .bng-separator-main {
+  fill: #333333; /* Soft dark gray */
+  stroke: #888888; /* Light gray for stroke */
+}
+
+.dark .bng-separator circle {
+  fill: #f97316; /* Warm beige-orange for contrast */
+}
+
+.dark .bng-separator g:last-child .bng-separator-main {
+  fill: #1a1a1a; /* Dark gray for last layer */
+}
+
+.dark .bng-separator g:nth-child(1) .bng-separator-main {
+  fill: #3d3d3d; /* Dark gray for first layer */
+}
+
+.dark .bng-separator g:nth-child(1) circle {
+  fill: #3d3d3d;
+}
+
+.dark .bng-separator g:nth-child(1) path {
+  stroke: rgba(255, 255, 255, 0.2); /* Subtle white stroke */
+}
+
+.dark .bng-separator g:nth-child(2) .bng-separator-main {
+  fill: #5a5a5a; /* Muted gray for second layer */
+}
+
+.dark .bng-separator g:nth-child(2) circle {
+  fill: #5a5a5a;
+}
+
+.dark .bng-separator g:nth-child(2) path {
+  stroke: rgba(230, 230, 230, 0.3); /* Light gray stroke */
+}
+
+.dark .bng-separator g:nth-child(3) .bng-separator-main {
+  fill: #707070; /* Soft gray for third layer */
+}
+
+.dark .bng-separator g:nth-child(3) circle {
+  fill: #707070;
+}
+
+.dark .bng-separator g:nth-child(3) path {
+  stroke: rgba(200, 200, 200, 0.5); /* Medium gray stroke */
+}
+
+.dark .bng-separator g:nth-child(4) .bng-separator-main {
+  fill: #8a8a8a; /* Light gray for fourth layer */
+}
+
+.dark .bng-separator g:nth-child(4) circle {
+  fill: #8a8a8a;
+}
+
+.dark .bng-separator g:nth-child(4) path {
+  stroke: rgba(180, 180, 180, 0.6); /* Soft gray stroke */
+}
+
+.dark .bng-separator g:nth-child(5) .bng-separator-main {
+  fill: black; /* Matches the footer background */
+}
+
+.dark .bng-separator g:nth-child(5) circle {
+  fill: black;
+}
+
+.dark .bng-separator g:nth-child(5) path {
+  stroke: #7a7a7a; /* Retain original stroke color */
+}
+
+.dark .bng-separator g:last-child circle {
+  fill: #f97316; /* Beige-orange accent color */
+}
