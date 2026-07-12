@@ -1,28 +1,34 @@
 <?php
 
 use Devdojo\Auth\Traits\HasConfigs;
+use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Support\Facades\Password;
-use function Laravel\Folio\{middleware, name};
-use Livewire\Volt\Component;
 use Livewire\Attributes\Validate;
+use Livewire\Volt\Component;
+
+use function Laravel\Folio\name;
 
 name('auth.password.request');
 
-new class extends Component
+new class() extends Component
 {
     use HasConfigs;
+    use ValidatesTurnstile;
 
     #[Validate('required|email')]
     public $email = null;
+
     public $emailSentMessage = false;
 
-    public function mount(){
+    public function mount()
+    {
         $this->loadConfigs();
     }
 
     public function sendResetPasswordLink()
     {
         $this->validate();
+        $this->validateTurnstile('auth_password_reset_request');
 
         $response = Password::broker()->sendResetLink(['email' => $this->email]);
 
@@ -68,6 +74,7 @@ new class extends Component
         @else
             <form wire:submit="sendResetPasswordLink" class="space-y-5">
                 <x-auth::elements.input :label="$language->passwordResetRequest->email" type="email" id="email" name="email" data-auth="email-input" wire:model="email" autofocus="true" autocomplete="email" />
+                <x-auth::elements.turnstile action="auth_password_reset_request" />
                 <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" submit="true">{{ $language->passwordResetRequest->button }}</x-auth::elements.button>
             </form>
         @endif

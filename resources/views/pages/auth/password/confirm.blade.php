@@ -2,6 +2,7 @@
 
 use Devdojo\Auth\Helper;
 use Devdojo\Auth\Traits\HasConfigs;
+use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
@@ -17,6 +18,7 @@ name('password.confirm');
 new class() extends Component
 {
     use HasConfigs;
+    use ValidatesTurnstile;
 
     #[Validate('required|current_password')]
     public $password = '';
@@ -29,6 +31,7 @@ new class() extends Component
     public function confirm()
     {
         $this->validate();
+        $this->validateTurnstile('auth_password_confirm');
 
         session()->put('auth.password_confirmed_at', time());
 
@@ -49,6 +52,7 @@ new class() extends Component
             />
             <form wire:submit="confirm" class="space-y-5">
                 <x-auth::elements.input :label="$language->passwordConfirm->password" type="password" id="password" name="password" data-auth="password-input" autofocus="true" wire:model="password" autocomplete="current-password" />
+                <x-auth::elements.turnstile action="auth_password_confirm" />
                 <x-auth::elements.button type="primary" rounded="md" data-auth="submit-button" submit="true">{{ $language->passwordConfirm->button }}</x-auth::elements.button>
             </form>
         </x-auth::elements.container>

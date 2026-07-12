@@ -1,0 +1,86 @@
+@props(['action'])
+
+@php($turnstileSiteKey = config('services.turnstile.site_key'))
+
+@if ($turnstileSiteKey)
+    <div
+        x-data="{
+            siteKey: @js($turnstileSiteKey),
+            action: @js($action),
+            widgetId: null,
+            scriptRequested: false,
+            pendingSubmit: false,
+            form: null,
+            init() {
+                const load = () => this.loadTurnstile();
+                window.addEventListener('pointerdown', load, { once: true, passive: true });
+                window.addEventListener('keydown', load, { once: true });
+
+                this.form = this.$el.closest('form');
+                this.form?.addEventListener('submit', event => {
+                    if (this.$refs.token.value) return;
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    this.pendingSubmit = true;
+                    this.loadTurnstile();
+                }, true);
+            },
+            loadTurnstile() {
+                if (this.scriptRequested) return;
+                this.scriptRequested = true;
+
+                if (window.turnstile) {
+                    this.renderTurnstile();
+                    return;
+                }
+
+                let script = document.querySelector('script[data-auth-turnstile]');
+                if (!script) {
+                    script = document.createElement('script');
+                    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                    script.async = true;
+                    script.defer = true;
+                    script.dataset.authTurnstile = 'true';
+                    document.head.appendChild(script);
+                }
+
+                script.addEventListener('load', () => this.renderTurnstile(), { once: true });
+            },
+            renderTurnstile() {
+                if (!window.turnstile || this.widgetId !== null) return;
+
+                this.widgetId = window.turnstile.render(this.$refs.widget, {
+                    sitekey: this.siteKey,
+                    action: this.action,
+                    appearance: 'interaction-only',
+                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                    callback: token => this.setToken(token),
+                    'expired-callback': () => this.setToken(''),
+                    'error-callback': () => this.setToken(''),
+                });
+            },
+            setToken(token) {
+                this.$refs.token.value = token;
+                this.$refs.token.dispatchEvent(new Event('input', { bubbles: true }));
+
+                if (token && this.pendingSubmit && this.form) {
+                    this.pendingSubmit = false;
+                    queueMicrotask(() => this.form.requestSubmit());
+                }
+            },
+            reset() {
+                this.setToken('');
+                if (this.widgetId !== null && window.turnstile) window.turnstile.reset(this.widgetId);
+            },
+        }"
+        x-on:auth-turnstile-reset.window="reset()"
+        class="space-y-2"
+    >
+        <div x-ref="widget" wire:ignore class="flex justify-center"></div>
+        <input x-ref="token" type="hidden" wire:model.defer="turnstileToken">
+        @error('turnstileToken')
+            <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
+    </div>
+@endif

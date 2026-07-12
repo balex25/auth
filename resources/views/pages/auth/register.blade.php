@@ -3,6 +3,7 @@
 use Devdojo\Auth\Helper;
 use Devdojo\Auth\Rules\PasswordStrength;
 use Devdojo\Auth\Traits\HasConfigs;
+use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +21,7 @@ name('auth.register');
 new class() extends Component
 {
     use HasConfigs;
+    use ValidatesTurnstile;
 
     public $name;
 
@@ -126,6 +128,7 @@ new class() extends Component
         }
 
         $this->validate();
+        $this->validateTurnstile('auth_register');
 
         $userData = [
             'email' => $this->email,
@@ -195,6 +198,9 @@ new class() extends Component
             <x-auth::elements.input :label="$language->register->password_confirmation" type="password" wire:model="password_confirmation" id="password_confirmation" name="password_confirmation" data-auth="password-confirmation-input" autocomplete="new-password" required />
             @endif
 
+            @if($showPasswordField)
+                <x-auth::elements.turnstile action="auth_register" />
+            @endif
             <x-auth::elements.button data-auth="submit-button" rounded="md" submit="true">{{ $language->register->button }}</x-auth::elements.button>
         </form>
         @endif

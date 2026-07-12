@@ -2,6 +2,7 @@
 
 use Devdojo\Auth\Helper;
 use Devdojo\Auth\Traits\HasConfigs;
+use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
@@ -15,6 +16,7 @@ name('verification.notice');
 new class() extends Component
 {
     use HasConfigs;
+    use ValidatesTurnstile;
 
     public function mount()
     {
@@ -27,6 +29,8 @@ new class() extends Component
         if ($user->hasVerifiedEmail()) {
             redirect(Helper::localizedUrl('/'));
         }
+
+        $this->validateTurnstile('auth_verification_resend');
 
         $user->sendEmailVerificationNotification();
 
@@ -63,6 +67,8 @@ new class() extends Component
                 <div class="text-sm leading-6 text-gray-700 dark:text-neutral-400">
                     <p>{{ $language->verify->description }} <a wire:click="resend" data-auth="verify-email-resend-link" class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer dark:text-neutral-300 hover:text-gray-600 dark:hover:text-neutral-200 focus:outline-hidden focus:underline">{{ $language->verify->new_request_link }}</a></p>
                 </div>
+
+                <x-auth::elements.turnstile action="auth_verification_resend" />
 
 
 

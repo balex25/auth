@@ -3,6 +3,7 @@
 use App\Models\User;
 use Devdojo\Auth\Helper;
 use Devdojo\Auth\Traits\HasConfigs;
+use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
@@ -22,6 +23,7 @@ name('auth.two-factor-challenge');
 new class() extends Component
 {
     use HasConfigs;
+    use ValidatesTurnstile;
 
     public $recovery = false;
 
@@ -54,6 +56,7 @@ new class() extends Component
     {
         $this->auth_code = $code;
         $this->validate();
+        $this->validateTurnstile('auth_two_factor');
 
         $user = User::find(session()->get('login.id'));
         $secret = decrypt($user->two_factor_secret);
@@ -70,6 +73,9 @@ new class() extends Component
 
     public function submit_recovery_code()
     {
+        $this->validateOnly('recovery_code');
+        $this->validateTurnstile('auth_two_factor');
+
         $user = User::find(session()->get('login.id'));
         $valid = in_array($this->recovery_code, json_decode(decrypt($user->two_factor_recovery_codes)));
 
@@ -129,11 +135,13 @@ new class() extends Component
                         @error('auth_code')
                             <p class="my-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                        <x-auth::elements.turnstile action="auth_two_factor" />
                         <x-auth::elements.button rounded="md" submit="true" wire:click="submitCode(document.getElementById('auth-input-code').value)">{{ $language->twoFactorChallenge->button }}</x-auth::elements.button>
                     @else
                         <div class="relative">
                             <x-auth::elements.input :label="$language->twoFactorChallenge->recovery_code" type="text" wire:keydown.enter="submit_recovery_code" wire:model="recovery_code" id="auth-2fa-recovery-code" required />
                         </div>
+                        <x-auth::elements.turnstile action="auth_two_factor" />
                         <x-auth::elements.button rounded="md" submit="true" wire:click="submit_recovery_code">{{ $language->twoFactorChallenge->button }}</x-auth::elements.button>
                     @endif
 

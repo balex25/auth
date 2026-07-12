@@ -2,6 +2,7 @@
 
 use Devdojo\Auth\Helper;
 use Devdojo\Auth\Traits\HasConfigs;
+use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -20,6 +21,7 @@ name('auth.login');
 new class() extends Component
 {
     use HasConfigs;
+    use ValidatesTurnstile;
 
     #[Validate('required|email')]
     public $email = '';
@@ -98,6 +100,7 @@ new class() extends Component
         }
 
         $this->validate();
+        $this->validateTurnstile('auth_login');
 
         $credentials = ['email' => $this->email, 'password' => $this->password];
 
@@ -206,6 +209,9 @@ new class() extends Component
                     </div>
                 </div>
 
+                @if($showPasswordField)
+                    <x-auth::elements.turnstile action="auth_login" />
+                @endif
                 <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" size="md" submit="true">
                     {{ $language->login->button }}
                 </x-auth::elements.button>
