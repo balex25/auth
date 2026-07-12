@@ -193,3 +193,31 @@
 .dark .bng-separator g:last-child circle {
   fill: #f97316; /* Beige-orange accent color */
 }
+
+.logo--header:after {
+	animation-duration: .5s;
+	animation-iteration-count: 1;
+	animation-direction: forwards;
+	opacity: 0;
+	content: "";
+	pointer-events: none;
+	background-color: #fff3;
+	transition: all .2s ease-out;
+	animation-timing-function: linear;
+	animation-fill-mode: both;
+	display: inline-block;
+	position: absolute;
+	top: -50%;
+	right: 105%;
+	bottom: -50%;
+	left: -2.5%;
+	transform: rotate(20deg);
+}
+
+.logo--header:after {
+  background-color: #1f293780;
+}
+
+.dark .logo--header:after {
+  background-color: #00000080;
+}

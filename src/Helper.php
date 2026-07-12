@@ -85,7 +85,36 @@ class Helper
             return $routeLocale;
         }
 
+        $refererLocale = self::localeFromUrl(request()->headers->get('referer'), $locales);
+
+        if ($refererLocale !== null) {
+            return $refererLocale;
+        }
+
+        $applicationLocale = app()->getLocale();
+
+        if (in_array($applicationLocale, $locales, true)) {
+            return $applicationLocale;
+        }
+
         return null;
+    }
+
+    private static function localeFromUrl(?string $url, array $locales): ?string
+    {
+        if ($url === null) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+
+        if (! is_string($path)) {
+            return null;
+        }
+
+        $locale = collect(explode('/', trim($path, '/')))->first();
+
+        return is_string($locale) && in_array($locale, $locales, true) ? $locale : null;
     }
 
     private static function prefixUrlPath(string $url, string $locale): string
