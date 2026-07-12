@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Session;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -96,4 +97,27 @@ it('user can view two factor challenge page when it\'s enabled', function () {
     $this->get('user/two-factor-authentication')
         ->assertOk()
         ->assertSee('auth.twoFactorSetup.disabled_title');
+});
+
+it('renders filled numeric code inputs without browser number controls', function () {
+    $html = Blade::render('<x-auth::elements.input-code digits="6" />');
+
+    expect($html)
+        ->toContain('type="text"')
+        ->toContain('inputmode="numeric"')
+        ->toContain('pattern="[0-9]*"')
+        ->toContain("replace(/\\D/g, '')")
+        ->toContain('dark:bg-white/5')
+        ->not->toContain('type="number"');
+});
+
+it('renders secondary buttons with the Filament neutral action palette', function () {
+    $html = Blade::render('<x-auth::elements.button type="secondary">Cancel</x-auth::elements.button>');
+
+    expect($html)
+        ->toContain('border-gray-200')
+        ->toContain('bg-white')
+        ->toContain('dark:border-white/20')
+        ->toContain('dark:bg-white/5')
+        ->toContain('dark:hover:bg-white/10');
 });

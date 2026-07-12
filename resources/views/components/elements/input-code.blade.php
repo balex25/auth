@@ -63,7 +63,7 @@
         pasteValue(event){
             event.preventDefault();
             {{-- let paste = (event.clipboardData || window.clipboardData).getData('text'); --}}
-            let paste = (event.clipboardData || window.clipboardData).getData('text');
+            let paste = (event.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
             for (let i = 0; i < paste.length; i++) {
                 if (i < this.total_digits) {
                     this.$refs['input' + (i + 1)].value = paste[i];
@@ -101,13 +101,15 @@
             @for ($x = 1; $x <= $digits; $x++)
                 <input
                     x-ref="input{{ $x }}"
-                    numeric="true"
-                    type="number"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     x-on:paste="pasteValue"
                     x-on:keydown="moveCursorNext({{ $x }}, {{ $digits }}, event)"
                     x-on:focus="$el.select()"
-                    class="w-12 h-12 font-light text-center text-black rounded-md border shadow-sm appearance-none auth-component-code-input dark:text-dark-400 border-zinc-200 focus:border-2"
+                    class="auth-component-code-input size-12 appearance-none rounded-lg border border-gray-200 bg-white text-center text-base font-medium text-gray-950 shadow-sm transition duration-75 focus:border-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-600/20 dark:border-white/20 dark:bg-white/5 dark:text-white dark:focus:border-orange-500 dark:focus:ring-orange-500/20"
                     maxlength="1"
+                    autocomplete="one-time-code"
                 />
             @endfor
         </div>

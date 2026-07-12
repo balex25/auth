@@ -26,7 +26,7 @@ new class() extends Component
 
     public $showRecoveryCodes = true;
 
-    #[Validate('required|min:6')]
+    #[Validate('required|digits:6')]
     public $auth_code;
 
     public $secret = '';
