@@ -3,6 +3,7 @@
 namespace Devdojo\Auth;
 
 use Illuminate\Http\RedirectResponse;
+use Livewire\Features\SupportRedirects\Redirector as LivewireRedirector;
 
 class Helper
 {
@@ -120,7 +121,7 @@ class Helper
         return null;
     }
 
-    public static function intendedRedirect(string $default): RedirectResponse
+    public static function intendedRedirect(string $default): RedirectResponse|LivewireRedirector
     {
         return redirect()->intended(self::localizedRedirectTarget($default));
     }
