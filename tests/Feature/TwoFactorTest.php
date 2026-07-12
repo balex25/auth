@@ -97,6 +97,7 @@ it('user can view two factor challenge page when it\'s enabled', function () {
     $this->get('user/two-factor-authentication')
         ->assertOk()
         ->assertSee('auth.twoFactorSetup.disabled_title')
+        ->assertSee('auth/build/assets/styles.css?v=', false)
         ->assertSee("localStorage.getItem('theme')", false)
         ->assertSee("root.classList.toggle('dark', isDark)", false)
         ->assertSee("window.addEventListener('storage'", false);

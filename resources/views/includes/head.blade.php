@@ -17,8 +17,12 @@
 @if(config('devdojo.auth.settings.dev_mode'))
     @vite(['packages/devdojo/auth/resources/css/auth.css', 'packages/devdojo/auth/resources/css/auth.js'])
 @else
+    @php
+        $authStylesPath = public_path('auth/build/assets/styles.css');
+        $authStylesVersion = file_exists($authStylesPath) ? filemtime($authStylesPath) : null;
+    @endphp
     <!--<script src="{{ asset('/auth/build/assets/scripts.js') }}" defer></script>-->
-    <link rel="stylesheet" href="{{ asset('/auth/build/assets/styles.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/auth/build/assets/styles.css') }}{{ $authStylesVersion ? '?v='.$authStylesVersion : '' }}" />
 @endif
 
 <link href="{{ asset('images/auth/favicon.png') }}" rel="icon" media="(prefers-color-scheme: light)" />
