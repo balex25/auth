@@ -198,7 +198,7 @@ new class() extends Component
                 @endif
 
                 @php
-                    $passwordFieldClasses = $showPasswordField ? 'flex flex-col gap-2' : 'hidden';
+                    $passwordFieldClasses = $showPasswordField ? 'flex flex-col gap-4' : 'hidden';
                 @endphp
 
                 <div class="{{ $passwordFieldClasses }}">

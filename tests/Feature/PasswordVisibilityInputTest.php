@@ -10,6 +10,8 @@ it('renders a visibility toggle for password inputs', function () {
         ->toContain('passwordVisible = ! passwordVisible')
         ->toContain('x-bind:aria-pressed="passwordVisible"')
         ->toContain('passwordVisible ? hidePasswordLabel : showPasswordLabel')
+        ->toContain('inline-flex size-8 items-center')
+        ->toContain('class="size-4 shrink-0"')
         ->toContain('auth.passwordVisibility.show')
         ->toContain('auth.passwordVisibility.hide');
 });

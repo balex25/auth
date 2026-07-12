@@ -186,6 +186,7 @@ it('shows password requirements on registration page when enabled', function () 
     $response->assertSee('At least 10 characters');
     $response->assertSee('meetsPasswordRequirements()', false);
     $response->assertSee('M20 6 9 17l-5-5', false);
+    $response->assertSee('relative mt-2 w-full rounded-md', false);
 });
 
 it('hides password requirements when disabled', function () {

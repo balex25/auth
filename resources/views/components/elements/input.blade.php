@@ -65,7 +65,7 @@
     "
     class="w-full h-auto"
 >
-    <div class="flex relative flex-col justify-center h-11">
+    <div class="flex relative flex-col justify-center {{ $displaysPasswordRequirements ? 'min-h-11' : 'h-11' }}">
         <div class="flex relative">
             @if($label)
                 <label
@@ -103,7 +103,7 @@
                     @if ($type === 'password')
                         @input="passwordValue = $el.value"
                     @endif
-                    class="auth-component-input appearance-none flex w-full h-11 {{ $type === 'password' ? ($displaysPasswordRequirements ? 'pr-[5.5rem] pl-3.5' : 'pr-11 pl-3.5') : 'px-3.5' }} text-sm rounded-md
+                    class="auth-component-input appearance-none flex w-full h-11 {{ $type === 'password' ? ($displaysPasswordRequirements ? 'pr-20 pl-3.5' : 'pr-11 pl-3.5') : 'px-3.5' }} text-sm rounded-md
                            bg-gray-800 dark:bg-black text-gray-100 dark:text-white
                            border border-gray-600
                            placeholder:text-gray-400 dark:placeholder:text-neutral-500
@@ -120,10 +120,10 @@
                             x-on:click="requirementsOpen = ! requirementsOpen"
                             x-bind:aria-expanded="requirementsOpen"
                             aria-label="{{ __('Password requirements') }}"
-                            class="absolute inset-y-0 right-11 inline-flex w-11 items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-600 dark:focus-visible:ring-orange-500"
+                            class="absolute top-3 right-10 inline-flex size-8 items-center justify-center rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 dark:focus-visible:ring-orange-500"
                             x-bind:class="meetsPasswordRequirements() ? 'text-green-500' : 'text-red-500'"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
                         </button>
 
                         <div
@@ -135,10 +135,10 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 translate-y-0"
                             x-transition:leave-end="opacity-0 translate-y-1"
-                            class="absolute top-full right-0 z-30 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-3 text-xs shadow-xl dark:border-neutral-700 dark:bg-neutral-900"
+                            class="relative mt-2 w-full rounded-md border border-gray-600 bg-gray-800 p-3 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-900"
                         >
-                            <p class="mb-2 font-medium text-gray-700 dark:text-neutral-200">{{ __('Password must contain:') }}</p>
-                            <ul class="space-y-1.5 text-gray-600 dark:text-neutral-400">
+                            <p class="mb-2 font-medium text-gray-200 dark:text-neutral-200">{{ __('Password must contain:') }}</p>
+                            <ul class="grid gap-1.5 text-gray-400 dark:text-neutral-400 sm:grid-cols-2">
                                 <li class="flex items-center gap-2" x-bind:class="meetsMinimumLength() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
                                     <span>{{ trans_choice('At least :count character|At least :count characters', $minimumPasswordLength, ['count' => $minimumPasswordLength]) }}</span>
@@ -174,13 +174,13 @@
                         x-on:click="passwordVisible = ! passwordVisible"
                         x-bind:aria-pressed="passwordVisible"
                         x-bind:aria-label="passwordVisible ? hidePasswordLabel : showPasswordLabel"
-                        class="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center rounded-r-md text-gray-400 transition-colors hover:text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-600 dark:text-neutral-500 dark:hover:text-neutral-200 dark:focus-visible:ring-orange-500"
+                        class="absolute top-3 right-1 inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-white/5 hover:text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 dark:text-neutral-500 dark:hover:text-neutral-200 dark:focus-visible:ring-orange-500"
                     >
-                        <svg x-show="! passwordVisible" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true">
+                        <svg x-show="! passwordVisible" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 shrink-0" aria-hidden="true">
                             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
                             <circle cx="12" cy="12" r="3" />
                         </svg>
-                        <svg x-show="passwordVisible" x-cloak xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true">
+                        <svg x-show="passwordVisible" x-cloak xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 shrink-0" aria-hidden="true">
                             <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
                             <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
                             <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
