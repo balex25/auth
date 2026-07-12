@@ -119,7 +119,7 @@ new class() extends Component
 
 <x-auth::layouts.empty :title="__('auth.twoFactorSetup.page_title')">
     @volt('user.two-factor-authentication')
-        <section class="flex min-h-dvh w-full @container items-center justify-center bg-white px-6 py-10 text-gray-900 dark:bg-zinc-900 dark:text-gray-100">
+        <section class="flex min-h-dvh w-full @container items-center justify-center bg-white px-6 py-10 text-gray-900 dark:bg-zinc-900 dark:text-neutral-100">
 
             <div x-data x-on:code-input-complete.window="$dispatch('submitCode', [event.detail.code])" class="flex flex-col w-full max-w-sm mx-auto text-sm">
                 @if($confirmed)
@@ -129,7 +129,7 @@ new class() extends Component
                         @if($showRecoveryCodes)
                             <div class="relative">
                                 <p class="font-medium">{{ $language->twoFactorSetup->recovery_codes_description }}</p>
-                                <div class="grid max-w-xl gap-1 px-4 py-4 mt-4 font-mono text-sm bg-gray-100 text-gray-900 rounded-lg dark:bg-gray-900 dark:text-gray-100">
+                                <div class="grid max-w-xl gap-1 px-4 py-4 mt-4 font-mono text-sm bg-gray-100 text-gray-900 rounded-lg dark:bg-neutral-900 dark:text-neutral-100">
                                     
                                     @foreach (json_decode(decrypt(auth()->user()->two_factor_recovery_codes), true) as $code)
                                         <div>{{ $code }}</div>

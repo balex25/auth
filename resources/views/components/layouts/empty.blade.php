@@ -29,7 +29,7 @@
     </script>
     @include('auth::includes.head')
 </head>
-<body class="bg-white text-gray-900 dark:bg-zinc-900 dark:text-gray-100">
+<body class="bg-white text-gray-900 dark:bg-zinc-900 dark:text-neutral-100">
     {{ $slot }}
 </body>
 </html>

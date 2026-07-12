@@ -56,15 +56,15 @@ new class extends Component
                     </div>
                 @endif
 
-                <div class="text-sm leading-6 text-gray-700 dark:text-gray-400">
-                    <p>{{ $language->verify->description }} <a wire:click="resend" data-auth="verify-email-resend-link" class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer dark:text-gray-300 hover:text-gray-600 focus:outline-hidden focus:underline">{{ $language->verify->new_request_link }}</a></p>
+                <div class="text-sm leading-6 text-gray-700 dark:text-neutral-400">
+                    <p>{{ $language->verify->description }} <a wire:click="resend" data-auth="verify-email-resend-link" class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer dark:text-neutral-300 hover:text-gray-600 focus:outline-hidden focus:underline">{{ $language->verify->new_request_link }}</a></p>
                 </div>
 
 
 
-            <div class="mt-2 space-x-0.5 text-sm leading-5 text-center text-gray-600 translate-y-4 dark:text-gray-400">
+            <div class="mt-2 space-x-0.5 text-sm leading-5 text-center text-gray-600 translate-y-4 dark:text-neutral-400">
                 <span>{{ $language->verify->or }}</span>
-                <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-gray-500 underline cursor-pointer dark:text-gray-400 dark:hover:text-gray-300 hover:text-gray-800">
+                <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-gray-500 underline cursor-pointer dark:text-neutral-400 dark:hover:text-neutral-300 hover:text-gray-800">
                   {{ $language->verify->logout }}
                 </button>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

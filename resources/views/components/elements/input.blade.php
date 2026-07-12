@@ -35,7 +35,7 @@
                         'top-4 ml-2.5 text-[15px] text-gray-400' : !focusedOrFilled
                     }"
                     class="block absolute top-0 px-1.5 py-0 font-normal leading-normal
-                           text-gray-400 dark:text-gray-500
+                           text-gray-400 dark:text-neutral-500
                            bg-gray-800 dark:bg-black
                            duration-300 ease-out cursor-text auth-component-input"
                     x-cloak
@@ -58,7 +58,7 @@
                     class="auth-component-input appearance-none flex w-full h-11 px-3.5 text-sm rounded-md
                            bg-gray-800 dark:bg-black text-gray-100 dark:text-white
                            border border-gray-600
-                           placeholder:text-gray-400 dark:placeholder:text-gray-500
+                           placeholder:text-gray-400 dark:placeholder:text-neutral-500
                            focus:outline-none focus:ring-1 focus:ring-zinc-200 focus:border-zinc-200
                            ring-offset-gray-800 dark:ring-offset-black
                            disabled:cursor-not-allowed disabled:opacity-50

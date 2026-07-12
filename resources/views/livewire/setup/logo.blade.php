@@ -33,13 +33,13 @@
                     <div class="flex relative justify-center items-center w-full">                                
                         <div class="flex justify-center items-center w-full">
                             <label for="logo_image" class="relative w-full h-auto">
-                                <div x-show="!logo_image" class="flex flex-col justify-center items-center w-full h-auto rounded-lg cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                <div x-show="!logo_image" class="flex flex-col justify-center items-center w-full h-auto rounded-lg cursor-pointer dark:hover:bg-neutral-800 dark:bg-neutral-700 hover:bg-gray-100 dark:border-neutral-600 dark:hover:border-neutral-500 dark:hover:bg-neutral-600">
                                     <div class="flex flex-col justify-center items-center pt-5 pb-6">
-                                        <svg class="mb-3 w-6 h-6 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <svg class="mb-3 w-6 h-6 text-gray-500 dark:text-neutral-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                                         </svg>
-                                        <p class="mb-1 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> an image</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">JPG, PNG (png for best results)</p>
+                                        <p class="mb-1 text-sm text-gray-500 dark:text-neutral-400"><span class="font-semibold">Click to upload</span> an image</p>
+                                        <p class="text-xs text-gray-500 dark:text-neutral-400">JPG, PNG (png for best results)</p>
                                     </div>
                                 </div>
                                 <div x-show="logo_image" class="flex justify-center items-center pb-2 w-full">

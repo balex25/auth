@@ -40,7 +40,7 @@ new class extends Component
                         <p class="text-sm underline">Click here to see what your authentication pages look like.</p>
                     </div>
                 </div>
-                <div class="relative w-full px-5 py-4 mt-6 text-gray-900 bg-gray-100 border border-gray-200 rounded-md dark:bg-zinc-700 dark:text-gray-300 dark:border-gray-700">
+                <div class="relative w-full px-5 py-4 mt-6 text-gray-900 bg-gray-100 border border-gray-200 rounded-md dark:bg-zinc-700 dark:text-neutral-300 dark:border-neutral-700">
                     <div class="text-sm opacity-80">To learn more about this authentication package, be sure to <a href="https://auth.devdojo.com/docs" target="_blank" class="underline">visit the documentation</a> or <a href="https://github.com/thedevdojo/auth" target="_blank" class="underline">view the project on Github</a>.</div>
                 </div>
             </section>
