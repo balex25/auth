@@ -30,6 +30,9 @@ beforeEach(function () {
 
 it('guards the passwordless login UI and action with the feature setting', function () {
     $loginView = file_get_contents(__DIR__.'/../../resources/views/pages/auth/login.blade.php');
+    $appLayoutView = file_get_contents(__DIR__.'/../../resources/views/components/layouts/app.blade.php');
+    $sessionMessageView = file_get_contents(__DIR__.'/../../resources/views/components/elements/session-message.blade.php');
+    $themeView = file_get_contents(__DIR__.'/../../resources/views/includes/theme.blade.php');
     $turnstileView = file_get_contents(__DIR__.'/../../resources/views/components/elements/turnstile.blade.php');
     Blade::compileString($loginView);
 
@@ -37,14 +40,27 @@ it('guards the passwordless login UI and action with the feature setting', funct
         ->toContain("config('devdojo.auth.settings.passwordless_login_enabled', false)")
         ->toContain('data-auth="passwordless-login-button"')
         ->toContain(':data-auth-turnstile-bypass="$showPasswordField ? false : true"')
-        ->toContain("@if(config('devdojo.auth.settings.passwordless_login_enabled', false))")
         ->toContain('requestPasswordlessLogin')
         ->toContain('passwordless_login_max_attempts_per_minute')
         ->toContain('@if($passwordlessLinkSent)')
         ->toContain('<x-auth::elements.session-message')
         ->toContain('type="success"')
+        ->toContain("config('devdojo.auth.settings.passwordless_login_enabled', false) && ! \$showPasswordField")
         ->and(config('devdojo.auth.language.login.passwordless_button'))
         ->toBe('Continue with passwordless')
+        ->and($sessionMessageView)
+        ->toContain('bg-red-50 dark:bg-red-600')
+        ->toContain('bg-orange-50 dark:bg-orange-600')
+        ->toContain('bg-green-50 dark:bg-green-600')
+        ->toContain('bg-blue-50 dark:bg-blue-600')
+        ->toContain("@case('success')")
+        ->toContain("@case('error')")
+        ->toContain("@case('warning')")
+        ->and($appLayoutView)
+        ->toContain("@include('auth::includes.theme')")
+        ->and($themeView)
+        ->toContain("localStorage.getItem('theme')")
+        ->toContain("root.classList.toggle('dark', isDark)")
         ->and($turnstileView)
         ->toContain("event.submitter?.matches('[data-auth-turnstile-bypass]')");
 
@@ -71,6 +87,35 @@ it('sends a one-time link to a verified user', function () {
     });
 
     expect(is_subclass_of(PasswordlessLoginNotification::class, ShouldQueue::class))->toBeFalse();
+});
+
+it('integrates passwordless settings and preview into auth setup', function () {
+    app()->detectEnvironment(fn () => 'local');
+
+    $setupLayout = file_get_contents(__DIR__.'/../../resources/views/components/layouts/setup.blade.php');
+    $settingsView = file_get_contents(__DIR__.'/../../resources/views/pages/auth/setup/settings.blade.php');
+    $previewView = file_get_contents(__DIR__.'/../../resources/views/pages/auth/setup/preview/passwordless.blade.php');
+
+    expect($setupLayout)
+        ->toContain("'name' : 'Passwordless Login'")
+        ->toContain("'url' : '/auth/setup/preview/passwordless'")
+        ->and($settingsView)
+        ->toContain("'passwordless' => ['title' => 'Passwordless Login'")
+        ->toContain('is_int($settings[$key]) => (int) $value')
+        ->toContain("\$key === 'passwordless_login_expires_minutes' ? 60 : null")
+        ->and($previewView)
+        ->toContain('<x-auth::elements.passwordless-login :auto-submit="false"')
+        ->and(config('devdojo.auth.descriptions.settings.passwordless_login_enabled'))
+        ->not->toBeEmpty()
+        ->and(config('devdojo.auth.descriptions.settings.passwordless_login_expires_minutes'))
+        ->not->toBeEmpty()
+        ->and(config('devdojo.auth.descriptions.settings.passwordless_login_max_attempts_per_minute'))
+        ->not->toBeEmpty();
+
+    $this->get('/auth/setup/preview/passwordless')
+        ->assertSuccessful()
+        ->assertSee('auth.passwordless.confirm_button')
+        ->assertDontSee('form.submit()', false);
 });
 
 it('refuses passwordless login for an unverified account', function () {

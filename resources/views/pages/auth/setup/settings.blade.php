@@ -23,8 +23,17 @@ new class extends Component
         $this->descriptions = (object) config('devdojo.auth.descriptions');
     }
 
-    public function update($key, $value)
+    public function update(string $key, mixed $value): void
     {
+        $settings = (array) config('devdojo.auth.settings');
+        abort_unless(array_key_exists($key, $settings), 422);
+
+        $value = match (true) {
+            is_bool($settings[$key]) => filter_var($value, FILTER_VALIDATE_BOOL),
+            is_int($settings[$key]) => (int) $value,
+            default => $value,
+        };
+
         \Config::write('devdojo.auth.settings.'.$key, $value);
         Artisan::call('config:clear');
 
@@ -39,6 +48,7 @@ new class extends Component
         $prefixConfig = [
             'registration' => ['title' => 'Registration', 'description' => 'User registration settings'],
             'password' => ['title' => 'Password Security', 'description' => 'Password strength and validation', 'collapsed' => true],
+            'passwordless' => ['title' => 'Passwordless Login', 'description' => 'One-time email sign-in link settings'],
             'login' => ['title' => 'Login', 'description' => 'Login behavior settings'],
             'social' => ['title' => 'Social Providers', 'description' => 'Social login settings'],
             'redirect' => ['title' => 'Redirects', 'description' => 'Where to send users after actions'],
@@ -100,7 +110,18 @@ new class extends Component
                                             @if(is_bool($value))
                                                 <x-auth::setup.checkbox-title-description wire:change="update('{{ $key }}', $event.target.checked)" name="{{ $key }}" :$key :title="Helper::convertSlugToTitle($key)" :$description :checked="($value ? true : false)" />
                                             @else
-                                                <x-auth::setup.input :id="$key" wire:blur="update('{{ $key }}', $event.target.value)" :$description :label="Helper::convertSlugToTitle($key)" type="text" name="{{ $key }}" value="{{ $value }}" />
+                                                <x-auth::setup.input
+                                                    :id="$key"
+                                                    wire:blur="update('{{ $key }}', $event.target.value)"
+                                                    :$description
+                                                    :label="Helper::convertSlugToTitle($key)"
+                                                    :type="is_int($value) ? 'number' : 'text'"
+                                                    :min="is_int($value) ? 1 : null"
+                                                    :max="$key === 'passwordless_login_expires_minutes' ? 60 : null"
+                                                    :step="is_int($value) ? 1 : null"
+                                                    name="{{ $key }}"
+                                                    value="{{ $value }}"
+                                                />
                                             @endif
                                         </div>
                                     @endforeach

@@ -300,7 +300,7 @@ new class() extends Component
                     </x-auth::elements.button>
                 @endif
 
-                @if(config('devdojo.auth.settings.passwordless_login_enabled', false))
+                @if(config('devdojo.auth.settings.passwordless_login_enabled', false) && ! $showPasswordField)
                     <x-auth::elements.button
                         type="secondary"
                         data-auth="passwordless-login-button"

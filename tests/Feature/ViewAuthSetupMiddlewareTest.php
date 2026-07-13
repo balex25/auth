@@ -40,6 +40,7 @@ it('protects all setup routes with middleware', function () {
         '/auth/setup/providers',
         '/auth/setup/language',
         '/auth/setup/settings',
+        '/auth/setup/preview/passwordless',
     ];
 
     foreach ($setupRoutes as $route) {

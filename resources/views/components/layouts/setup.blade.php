@@ -93,6 +93,10 @@
                 'url' : '/auth/password/SomeReallyLongToken'
             },
             {
+                'name' : 'Passwordless Login',
+                'url' : '/auth/setup/preview/passwordless'
+            },
+            {
                 'name' : 'Two Factor Challenge',
                 'url' : '/auth/two-factor-challenge'
             },

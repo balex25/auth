@@ -27,5 +27,8 @@ return [
         'center_align_text' => 'Center align text?',
         'social_providers_location' => 'The location of the social provider buttons (top or bottom)',
         'check_account_exists_before_login' => 'Determines if the system checks for account existence before login',
+        'passwordless_login_enabled' => 'Allow verified users to request a secure, one-time email link instead of entering their password.',
+        'passwordless_login_expires_minutes' => 'How many minutes a passwordless sign-in link remains valid (between 1 and 60).',
+        'passwordless_login_max_attempts_per_minute' => 'Maximum passwordless link requests allowed per IP address and email address each minute.',
     ],
 ];

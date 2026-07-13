@@ -1,32 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => request()->query('theme') === 'dark'])>
 <head>
-    <script>
-        (() => {
-            const root = document.documentElement;
-            const media = window.matchMedia('(prefers-color-scheme: dark)');
-            const requestedTheme = new URLSearchParams(window.location.search).get('theme');
-            let theme = requestedTheme || localStorage.getItem('theme') || 'system';
-
-            const applyTheme = () => {
-                const isDark = theme === 'dark' || (theme === 'system' && media.matches);
-                root.classList.toggle('dark', isDark);
-                root.style.colorScheme = isDark ? 'dark' : 'light';
-            };
-
-            applyTheme();
-
-            media.addEventListener('change', applyTheme);
-            window.addEventListener('storage', (event) => {
-                if (event.key !== 'theme') {
-                    return;
-                }
-
-                theme = event.newValue || 'system';
-                applyTheme();
-            });
-        })();
-    </script>
+    @include('auth::includes.theme')
     @include('auth::includes.head')
 </head>
 <body class="bg-white text-gray-900 dark:bg-zinc-900 dark:text-neutral-100">
