@@ -13,9 +13,15 @@ use Illuminate\View\View;
 
 class PasswordlessLoginController
 {
-    public function __invoke(Request $request, PasswordlessLoginManager $passwordlessLogins, string $token): View|RedirectResponse
-    {
+    public function __invoke(
+        Request $request,
+        PasswordlessLoginManager $passwordlessLogins,
+        string $firstRouteParameter,
+        ?string $secondRouteParameter = null,
+    ): View|RedirectResponse {
         abort_unless(config('devdojo.auth.settings.passwordless_login_enabled', false), 404);
+
+        $token = $secondRouteParameter ?? $firstRouteParameter;
 
         if ($request->isMethod('get')) {
             return view('auth::pages.auth.passwordless-login');

@@ -1,16 +1,22 @@
-<!-- resources/views/components/auth/elements/session-message.blade.php -->
+@props([
+    'message' => null,
+    'type' => null,
+])
+
 @php
 $messageTypes = ['error', 'warning', 'success', 'info'];
-$message = null;
-$type = null;
 
-foreach ($messageTypes as $messageType) {
-    if (session()->has($messageType)) {
-        $message = session($messageType);
-        $type = $messageType;
-        break;
+if ($message === null) {
+    foreach ($messageTypes as $messageType) {
+        if (session()->has($messageType)) {
+            $message = session($messageType);
+            $type = $messageType;
+            break;
+        }
     }
 }
+
+$type = in_array($type, $messageTypes, true) ? $type : 'info';
 @endphp
 
 @if($message)

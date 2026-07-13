@@ -41,7 +41,8 @@ it('guards the passwordless login UI and action with the feature setting', funct
         ->toContain('requestPasswordlessLogin')
         ->toContain('passwordless_login_max_attempts_per_minute')
         ->toContain('@if($passwordlessLinkSent)')
-        ->toContain('bg-green-50')
+        ->toContain('<x-auth::elements.session-message')
+        ->toContain('type="success"')
         ->and(config('devdojo.auth.language.login.passwordless_button'))
         ->toBe('Continue with passwordless')
         ->and($turnstileView)
@@ -89,7 +90,9 @@ it('does not consume a magic link on get and allows it only once on post', funct
 
     $this->get($url)
         ->assertSuccessful()
-        ->assertSee('auth.passwordless.confirm_button');
+        ->assertSee('auth.passwordless.confirm_button')
+        ->assertSee('passwordless-login-form')
+        ->assertSee('form.submit()', false);
     $this->assertGuest();
 
     $this->post($url)
@@ -101,6 +104,28 @@ it('does not consume a magic link on get and allows it only once on post', funct
     $this->post($url)
         ->assertRedirect(Helper::authUrl('auth.login'));
     $this->assertGuest();
+});
+
+it('authenticates with a localized one-time link', function () {
+    config()->set('app.locales', ['en', 'ru']);
+    $user = createPasswordlessUser(['email_verified_at' => now()]);
+    Notification::fake();
+    $url = app(PasswordlessLoginManager::class)->send($user, 'en');
+
+    $this->get($url)
+        ->assertSuccessful()
+        ->assertSee('passwordless-login-form');
+
+    $this->post($url)
+        ->assertRedirect(Helper::localizedRedirectTarget(config('devdojo.auth.settings.redirect_after_auth')));
+
+    $this->assertAuthenticatedAs($user);
+
+    Auth::logout();
+
+    $this->post($url)
+        ->assertRedirect(Helper::authUrl('auth.login'))
+        ->assertSessionHas('error', 'auth.passwordless.invalid_or_expired');
 });
 
 it('requires the two factor challenge after consuming a magic link', function () {
