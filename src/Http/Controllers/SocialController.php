@@ -77,25 +77,24 @@ class SocialController
             return $providerUser;
         }
 
-        $user = app(config('auth.providers.users.model'))->where('email', $socialiteUser->getEmail())->first();
+        $user = app(config('auth.providers.users.model'))
+            ->where('email', $socialiteUser->getEmail())
+            ->first();
+
+        if ($user) {
+            return redirect(Helper::authUrl('auth.login'))->with(
+                'error',
+                __('auth.social.email_already_registered')
+            );
+        }
 
         // If no existing user and registrations are disabled, reject the request
-        if (! $user && ! config('devdojo.auth.settings.registration_enabled', true)) {
+        if (! config('devdojo.auth.settings.registration_enabled', true)) {
             return redirect(Helper::authUrl('auth.login'))->with('error', __('auth.register.registrations_disabled'));
         }
 
-        if ($user) {
-            $existingProvider = $user->socialProviders()->first();
-            if ($existingProvider) {
-                return redirect(Helper::authUrl('auth.login'))->with(
-                    'error',
-                    __('auth.social.email_associated_with_provider', ['provider' => $existingProvider->provider_slug])
-                );
-            }
-        }
-
-        return DB::transaction(function () use ($socialiteUser, $driver, $user) {
-            $user = $user ?? $this->createUser($socialiteUser);
+        return DB::transaction(function () use ($socialiteUser, $driver) {
+            $user = $this->createUser($socialiteUser);
 
             return $this->createSocialProviderUser($user, $socialiteUser, $driver);
         });
