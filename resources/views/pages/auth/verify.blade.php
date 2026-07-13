@@ -3,14 +3,13 @@
 use Devdojo\Auth\Helper;
 use Devdojo\Auth\Traits\HasConfigs;
 use Devdojo\Auth\Traits\ValidatesTurnstile;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Livewire\Volt\Component;
 
 use function Laravel\Folio\middleware;
 use function Laravel\Folio\name;
 
-// middleware(['auth', 'throttle:6,1']);
+middleware(['auth', 'throttle:6,1']);
 name('verification.notice');
 
 new class() extends Component
@@ -18,27 +17,64 @@ new class() extends Component
     use HasConfigs;
     use ValidatesTurnstile;
 
+    public int $retryAfter = 0;
+
     public function mount()
     {
         $this->loadConfigs();
+        $this->retryAfter = $this->verificationRetryAfter(auth()->user());
     }
 
     public function resend()
     {
         $user = auth()->user();
+        abort_unless($user instanceof MustVerifyEmail, 403);
+
         if ($user->hasVerifiedEmail()) {
-            redirect(Helper::localizedUrl('/'));
+            return redirect(Helper::localizedUrl('/'));
+        }
+
+        $this->retryAfter = $this->verificationRetryAfter($user);
+
+        if ($this->retryAfter > 0) {
+            $this->addError('verification', __('auth.verify.resend_rate_limited'));
+
+            return;
         }
 
         $this->validateTurnstile('auth_verification_resend');
 
-        $user->sendEmailVerificationNotification();
+        $sent = method_exists($user, 'resendEmailVerificationNotification')
+            ? $user->resendEmailVerificationNotification()
+            : $this->sendDefaultVerification($user);
 
-        event(new Verified($user));
         $this->resetTurnstile();
+        $this->retryAfter = $this->verificationRetryAfter($user);
+        $this->dispatch('verification-resend-cooldown', retryAfter: $this->retryAfter);
+
+        if (! $sent) {
+            $this->addError('verification', __('auth.verify.resend_rate_limited'));
+
+            return;
+        }
 
         $this->dispatch('resent');
         session()->flash('resent');
+
+    }
+
+    private function verificationRetryAfter(?object $user): int
+    {
+        return is_object($user) && method_exists($user, 'verificationEmailRetryAfter')
+            ? max(0, (int) $user->verificationEmailRetryAfter())
+            : 0;
+    }
+
+    private function sendDefaultVerification(MustVerifyEmail $user): bool
+    {
+        $user->sendEmailVerificationNotification();
+
+        return true;
     }
 };
 
@@ -65,8 +101,27 @@ new class() extends Component
                     </div>
                 @endif
 
+                @error('verification')
+                    <p class="mb-4 text-sm font-medium text-orange-600 dark:text-orange-400" role="alert">{{ $message }}</p>
+                @enderror
+
                 <div class="text-sm leading-6 text-gray-700 dark:text-neutral-400 mb-4">
-                    <p>{{ $language->verify->description }} <a wire:click="resend" data-auth="verify-email-resend-link" class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer dark:text-neutral-300 hover:text-gray-600 dark:hover:text-neutral-200 focus:outline-hidden focus:underline">{{ $language->verify->new_request_link }}</a></p>
+                    <p>
+                        {{ $language->verify->description }}
+                        <button
+                            type="button"
+                            wire:click="resend"
+                            data-auth="verify-email-resend-link"
+                            data-verification-resend
+                            data-retry-after="{{ $retryAfter }}"
+                            data-ready-label="{{ $language->verify->new_request_link }}"
+                            data-waiting-label="{{ $language->verify->resend_in ?? __('auth.verify.resend_in') }}"
+                            @disabled($retryAfter > 0)
+                            class="text-gray-700 underline transition duration-150 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline dark:text-neutral-300 hover:text-gray-600 dark:hover:text-neutral-200 dark:disabled:text-neutral-600 focus:outline-hidden focus:underline"
+                        >
+                            <span data-verification-resend-label>{{ $language->verify->new_request_link }}</span>
+                        </button>
+                    </p>
                 </div>
 
                 <x-auth::elements.turnstile action="auth_verification_resend" />

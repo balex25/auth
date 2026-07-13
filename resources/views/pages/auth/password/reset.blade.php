@@ -3,6 +3,8 @@
 use Devdojo\Auth\Traits\HasConfigs;
 use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
@@ -20,6 +22,10 @@ new class() extends Component
 
     public $emailSentMessage = false;
 
+    private const MAX_REQUESTS_PER_EMAIL_PER_HOUR = 5;
+
+    private const MAX_REQUESTS_PER_IP_PER_HOUR = 10;
+
     public function mount()
     {
         $this->loadConfigs();
@@ -30,10 +36,26 @@ new class() extends Component
         $this->validate();
         $this->validateTurnstile('auth_password_reset_request');
 
-        $response = Password::broker()->sendResetLink(['email' => $this->email]);
+        $normalizedEmail = Str::lower(trim((string) $this->email));
+        $emailKey = 'devdojo-auth:password-reset:email:'.hash('sha256', $normalizedEmail);
+        $ipKey = 'devdojo-auth:password-reset:ip:'.hash('sha256', request()->ip() ?: 'unknown');
 
-        if ($response == Password::RESET_LINK_SENT) {
-            $this->emailSentMessage = trans($response);
+        if (
+            RateLimiter::tooManyAttempts($emailKey, self::MAX_REQUESTS_PER_EMAIL_PER_HOUR)
+            || RateLimiter::tooManyAttempts($ipKey, self::MAX_REQUESTS_PER_IP_PER_HOUR)
+        ) {
+            $this->emailSentMessage = trans(Password::RESET_LINK_SENT);
+
+            return;
+        }
+
+        RateLimiter::hit($emailKey, 3600);
+        RateLimiter::hit($ipKey, 3600);
+
+        $response = Password::broker()->sendResetLink(['email' => $normalizedEmail]);
+
+        if (in_array($response, [Password::RESET_LINK_SENT, Password::RESET_THROTTLED, Password::INVALID_USER], true)) {
+            $this->emailSentMessage = trans(Password::RESET_LINK_SENT);
 
             return;
         }

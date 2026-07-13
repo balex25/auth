@@ -62,6 +62,8 @@ return [
         'description' => 'Before proceeding, please check your email for a verification link. If you did not receive the email,',
         'new_request_link' => 'click here to request another',
         'new_link_sent' => 'A new link has been sent to your email address.',
+        'resend_in' => 'Request again in :time',
+        'resend_rate_limited' => 'Please wait before requesting another verification email.',
         'or' => 'Or',
         'logout' => 'click here to logout',
     ],

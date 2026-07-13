@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use Devdojo\Auth\Tests\Fixtures\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -53,13 +53,14 @@ it('sends password reset link for valid email', function () {
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
-it('shows error for non-existent email on reset request', function () {
+it('returns the generic success response for a non-existent email', function () {
     Notification::fake();
 
     Livewire::test('auth.password.reset')
         ->set('email', 'nonexistent@example.com')
         ->call('sendResetPasswordLink')
-        ->assertHasErrors(['email']);
+        ->assertHasNoErrors()
+        ->assertSet('emailSentMessage', trans(Password::RESET_LINK_SENT));
 
     Notification::assertNothingSent();
 });
