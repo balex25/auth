@@ -24,7 +24,7 @@ class PasswordlessLoginNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(__('auth.passwordless.email_subject'))
             ->line(__('auth.passwordless.email_intro'))
             ->action(__('auth.passwordless.email_action'), $this->url)
