@@ -2,15 +2,11 @@
 
 namespace Devdojo\Auth\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PasswordlessLoginNotification extends Notification implements ShouldQueue
+class PasswordlessLoginNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(
         public readonly string $url,
         public readonly int $expiresInMinutes,
@@ -24,7 +20,7 @@ class PasswordlessLoginNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(__('auth.passwordless.email_subject'))
             ->line(__('auth.passwordless.email_intro'))
             ->action(__('auth.passwordless.email_action'), $this->url)

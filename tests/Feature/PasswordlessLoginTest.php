@@ -4,9 +4,12 @@ use Devdojo\Auth\Helper;
 use Devdojo\Auth\Notifications\PasswordlessLoginNotification;
 use Devdojo\Auth\PasswordlessLoginManager;
 use Devdojo\Auth\Tests\Fixtures\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 
 function createPasswordlessUser(array $attributes = []): User
 {
@@ -27,12 +30,30 @@ beforeEach(function () {
 
 it('guards the passwordless login UI and action with the feature setting', function () {
     $loginView = file_get_contents(__DIR__.'/../../resources/views/pages/auth/login.blade.php');
+    $turnstileView = file_get_contents(__DIR__.'/../../resources/views/components/elements/turnstile.blade.php');
+    Blade::compileString($loginView);
 
     expect($loginView)
         ->toContain("config('devdojo.auth.settings.passwordless_login_enabled', false)")
         ->toContain('data-auth="passwordless-login-button"')
+        ->toContain(':data-auth-turnstile-bypass="$showPasswordField ? false : true"')
+        ->toContain("@if(config('devdojo.auth.settings.passwordless_login_enabled', false))")
         ->toContain('requestPasswordlessLogin')
-        ->toContain('passwordless_login_max_attempts_per_minute');
+        ->toContain('passwordless_login_max_attempts_per_minute')
+        ->toContain('@if($passwordlessLinkSent)')
+        ->toContain('bg-green-50')
+        ->and(config('devdojo.auth.language.login.passwordless_button'))
+        ->toBe('Continue with passwordless')
+        ->and($turnstileView)
+        ->toContain("event.submitter?.matches('[data-auth-turnstile-bypass]')");
+
+    $passwordlessButton = Str::between(
+        $loginView,
+        'data-auth="passwordless-login-button"',
+        '{{ $language->login->passwordless_button }}',
+    );
+
+    expect($passwordlessButton)->not->toContain('<svg');
 });
 
 it('sends a one-time link to a verified user', function () {
@@ -47,6 +68,8 @@ it('sends a one-time link to a verified user', function () {
         return str_contains($notification->url, '/auth/passwordless/')
             && $notification->expiresInMinutes === 10;
     });
+
+    expect(is_subclass_of(PasswordlessLoginNotification::class, ShouldQueue::class))->toBeFalse();
 });
 
 it('refuses passwordless login for an unverified account', function () {

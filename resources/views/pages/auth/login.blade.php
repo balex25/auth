@@ -228,11 +228,28 @@ new class() extends Component
                 :description="$language->login->subheadline"
                 :show_subheadline="($language->login->show_subheadline ?? false)" />
 
-            <x-auth::elements.session-message />
+            @if($passwordlessLinkSent)
+                <div class="p-4 mb-2 bg-green-50 rounded-md dark:bg-green-600" role="status">
+                    <div class="flex">
+                        <div class="shrink-0">
+                            <svg aria-hidden="true" class="w-5 h-5 text-green-400 dark:text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
 
-            @if(config('devdojo.auth.settings.login_show_social_providers') && config('devdojo.auth.settings.social_providers_location') == 'top')
-                <x-auth::elements.social-providers />
-            @endif
+                        <div class="ml-3">
+                            <p class="text-sm font-medium leading-5 text-green-800 dark:text-green-200">
+                                {{ $language->login->passwordless_sent }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <x-auth::elements.session-message />
+
+                @if(config('devdojo.auth.settings.login_show_social_providers') && config('devdojo.auth.settings.social_providers_location') == 'top')
+                    <x-auth::elements.social-providers />
+                @endif
 
             <form wire:submit="authenticate" class="space-y-5">
 
@@ -272,14 +289,8 @@ new class() extends Component
                     </div>
                 </div>
 
-                @if($showPasswordField || ($showSocialProviderInfo && config('devdojo.auth.settings.passwordless_login_enabled', false)))
+                @if($showPasswordField || config('devdojo.auth.settings.passwordless_login_enabled', false))
                     <x-auth::elements.turnstile action="auth_login" />
-                @endif
-
-                @if($passwordlessLinkSent)
-                    <div class="rounded-md border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-300" role="status">
-                        {{ $language->login->passwordless_sent }}
-                    </div>
                 @endif
 
                 @error('passwordless')
@@ -287,12 +298,20 @@ new class() extends Component
                 @enderror
 
                 @if(!$showSocialProviderInfo)
-                    <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" size="md" submit="true" wire:target="authenticate">
-                        {{ $showPasswordField ? $language->login->continue_with_password : $language->login->button }}
+                    <x-auth::elements.button
+                        type="primary"
+                        data-auth="submit-button"
+                        :data-auth-turnstile-bypass="$showPasswordField ? false : true"
+                        rounded="md"
+                        size="md"
+                        submit="true"
+                        wire:target="authenticate"
+                    >
+                        {{ config('devdojo.auth.settings.passwordless_login_enabled', false) ? $language->login->continue_with_password : $language->login->button }}
                     </x-auth::elements.button>
                 @endif
 
-                @if(config('devdojo.auth.settings.passwordless_login_enabled', false) && ($showPasswordField || $showSocialProviderInfo))
+                @if(config('devdojo.auth.settings.passwordless_login_enabled', false))
                     <x-auth::elements.button
                         type="secondary"
                         data-auth="passwordless-login-button"
@@ -303,10 +322,6 @@ new class() extends Component
                         wire:target="requestPasswordlessLogin"
                         wire:loading.attr="disabled"
                     >
-                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
-                            <rect width="20" height="16" x="2" y="4" rx="2" />
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                        </svg>
                         {{ $language->login->passwordless_button }}
                     </x-auth::elements.button>
                 @endif
@@ -322,6 +337,7 @@ new class() extends Component
 
             @if(config('devdojo.auth.settings.login_show_social_providers') && config('devdojo.auth.settings.social_providers_location') != 'top')
                 <x-auth::elements.social-providers />
+            @endif
             @endif
 
         </x-auth::elements.container>

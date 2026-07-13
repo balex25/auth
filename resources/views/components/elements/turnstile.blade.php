@@ -19,6 +19,7 @@
 
                 this.form = this.$el.closest('form');
                 this.form?.addEventListener('submit', event => {
+                    if (event.submitter?.matches('[data-auth-turnstile-bypass]')) return;
                     if (this.$refs.token.value) return;
 
                     event.preventDefault();

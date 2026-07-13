@@ -20,7 +20,7 @@ return [
         'social_auth_authenticated_message' => 'You have been authenticated via __social_providers_list__. Please login to that network below.',
         'change_email' => 'Change Email',
         'continue_with_password' => 'Continue with password',
-        'passwordless_button' => 'Email me a login link',
+        'passwordless_button' => 'Continue with passwordless',
         'passwordless_sent' => 'Check your email. We sent you a one-time sign-in link.',
         'passwordless_unavailable' => 'Passwordless sign-in is unavailable for this account. Verify the email address and try again.',
         'passwordless_rate_limited' => 'Too many sign-in link requests. Please wait before trying again.',

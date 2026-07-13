@@ -37,3 +37,7 @@ input.auth-component-code-input::-webkit-outer-spin-button,
 input.auth-component-code-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+
+button[data-auth="passwordless-login-button"] {
+  @apply -mt-2
+}
