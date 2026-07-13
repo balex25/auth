@@ -10,6 +10,7 @@
             widgetId: null,
             scriptRequested: false,
             pendingSubmit: false,
+            pendingButton: null,
             form: null,
             init() {
                 const load = () => this.loadTurnstile();
@@ -23,6 +24,16 @@
                     event.preventDefault();
                     event.stopImmediatePropagation();
                     this.pendingSubmit = true;
+                    this.loadTurnstile();
+                }, true);
+
+                this.form?.addEventListener('click', event => {
+                    const button = event.target.closest('[data-auth-turnstile-submit]');
+                    if (!button || !this.form.contains(button) || this.$refs.token.value) return;
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    this.pendingButton = button;
                     this.loadTurnstile();
                 }, true);
             },
@@ -75,6 +86,13 @@
             setToken(token) {
                 this.$refs.token.value = token;
                 this.$refs.token.dispatchEvent(new Event('input', { bubbles: true }));
+
+                if (token && this.pendingButton) {
+                    const button = this.pendingButton;
+                    this.pendingButton = null;
+                    queueMicrotask(() => button.click());
+                    return;
+                }
 
                 if (token && this.pendingSubmit && this.form) {
                     this.pendingSubmit = false;

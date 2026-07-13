@@ -1,11 +1,14 @@
 <?php
 
 use Devdojo\Auth\Helper;
+use Devdojo\Auth\PasswordlessLoginManager;
 use Devdojo\Auth\Traits\HasConfigs;
 use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
@@ -37,6 +40,8 @@ new class() extends Component
     public $showIdentifierInput = true;
 
     public $showSocialProviderInfo = false;
+
+    public $passwordlessLinkSent = false;
 
     public $language = [];
 
@@ -154,6 +159,61 @@ new class() extends Component
         }
 
     }
+
+    public function requestPasswordlessLogin(PasswordlessLoginManager $passwordlessLogins): void
+    {
+        if (! config('devdojo.auth.settings.passwordless_login_enabled', false)) {
+            return;
+        }
+
+        $this->validateOnly('email');
+        $this->validateTurnstile('auth_login');
+
+        $normalizedEmail = Str::lower(trim($this->email));
+        $maximumAttempts = max(1, (int) config('devdojo.auth.settings.passwordless_login_max_attempts_per_minute', 3));
+        $rateLimitKeys = [
+            'devdojo-auth:passwordless:ip:'.request()->ip(),
+            'devdojo-auth:passwordless:email:'.hash('sha256', $normalizedEmail),
+        ];
+
+        if (collect($rateLimitKeys)->contains(fn (string $key): bool => RateLimiter::tooManyAttempts($key, $maximumAttempts))) {
+            $this->addError('passwordless', $this->language->login->passwordless_rate_limited);
+            $this->resetTurnstile();
+
+            return;
+        }
+
+        foreach ($rateLimitKeys as $rateLimitKey) {
+            RateLimiter::hit($rateLimitKey, 60);
+        }
+
+        $user = $this->userModel->where('email', $normalizedEmail)->first();
+
+        if (! $user || data_get($user, 'email_verified_at') === null) {
+            $this->addError('passwordless', $this->language->login->passwordless_unavailable);
+            $this->resetTurnstile();
+
+            return;
+        }
+
+        try {
+            $passwordlessLogins->send(
+                $user,
+                Helper::currentLocale() ?? app()->getLocale(),
+                session()->get('url.intended'),
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->addError('passwordless', $this->language->login->passwordless_send_failed);
+            $this->resetTurnstile();
+
+            return;
+        }
+
+        $this->resetErrorBag('passwordless');
+        $this->passwordlessLinkSent = true;
+        $this->resetTurnstile();
+    }
 };
 
 ?>
@@ -212,12 +272,44 @@ new class() extends Component
                     </div>
                 </div>
 
-                @if($showPasswordField)
+                @if($showPasswordField || ($showSocialProviderInfo && config('devdojo.auth.settings.passwordless_login_enabled', false)))
                     <x-auth::elements.turnstile action="auth_login" />
                 @endif
-                <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" size="md" submit="true">
-                    {{ $language->login->button }}
-                </x-auth::elements.button>
+
+                @if($passwordlessLinkSent)
+                    <div class="rounded-md border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-300" role="status">
+                        {{ $language->login->passwordless_sent }}
+                    </div>
+                @endif
+
+                @error('passwordless')
+                    <p class="text-sm text-red-600 dark:text-red-400" role="alert">{{ $message }}</p>
+                @enderror
+
+                @if(!$showSocialProviderInfo)
+                    <x-auth::elements.button type="primary" data-auth="submit-button" rounded="md" size="md" submit="true" wire:target="authenticate">
+                        {{ $showPasswordField ? $language->login->continue_with_password : $language->login->button }}
+                    </x-auth::elements.button>
+                @endif
+
+                @if(config('devdojo.auth.settings.passwordless_login_enabled', false) && ($showPasswordField || $showSocialProviderInfo))
+                    <x-auth::elements.button
+                        type="secondary"
+                        data-auth="passwordless-login-button"
+                        data-auth-turnstile-submit
+                        rounded="md"
+                        size="md"
+                        wire:click="requestPasswordlessLogin"
+                        wire:target="requestPasswordlessLogin"
+                        wire:loading.attr="disabled"
+                    >
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
+                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                        </svg>
+                        {{ $language->login->passwordless_button }}
+                    </x-auth::elements.button>
+                @endif
             </form>
 
 

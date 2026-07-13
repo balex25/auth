@@ -1,6 +1,7 @@
 <?php
 
 use Devdojo\Auth\Http\Controllers\LogoutController;
+use Devdojo\Auth\Http\Controllers\PasswordlessLoginController;
 use Devdojo\Auth\Http\Controllers\SocialController;
 use Devdojo\Auth\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,15 @@ Route::middleware(['auth', 'web'])->group(function () {
 });
 
 Route::middleware(['web'])->group(function () {
+    Route::match(['get', 'post'], 'auth/passwordless/{token}', PasswordlessLoginController::class)
+        ->middleware(['signed', 'throttle:20,1'])
+        ->name('auth.passwordless.login');
+
+    Route::match(['get', 'post'], '{locale}/auth/passwordless/{token}', PasswordlessLoginController::class)
+        ->where('locale', implode('|', config('app.locales', [config('app.locale', 'en')])))
+        ->middleware(['signed', 'throttle:20,1'])
+        ->name('auth.passwordless.login.localized');
+
     // Add social redirect and callback routes
     Route::get('auth/{driver}/redirect', [SocialController::class, 'redirect'])
         ->middleware('store-intended-redirect');

@@ -26,5 +26,8 @@ return [
     'center_align_text' => false,
     'social_providers_location' => 'bottom',
     'check_account_exists_before_login' => false,
+    'passwordless_login_enabled' => false,
+    'passwordless_login_expires_minutes' => 10,
+    'passwordless_login_max_attempts_per_minute' => 3,
     'include_wire_navigate' => true,
 ];

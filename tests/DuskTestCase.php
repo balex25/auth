@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Devdojo\Auth\Tests;
 
 use AleBatistella\DuskApiConf\Traits\UsesDuskApiConfig;
 use Facebook\WebDriver\Chrome\ChromeOptions;
@@ -53,13 +53,15 @@ abstract class DuskTestCase extends BaseTestCase
             $chromeOptions[] = '--headless';
         }
 
-        $options = (new ChromeOptions)->addArguments($chromeOptions);
+        $options = (new ChromeOptions())->addArguments($chromeOptions);
 
         $options->setExperimentalOption('mobileEmulation', ['userAgent' => 'laravel/dusk']);
 
         return RemoteWebDriver::create(
-            'http://localhost:9515', DesiredCapabilities::chrome()->setCapability(
-                ChromeOptions::CAPABILITY, $options
+            'http://localhost:9515',
+            DesiredCapabilities::chrome()->setCapability(
+                ChromeOptions::CAPABILITY,
+                $options
             )
         );
     }
