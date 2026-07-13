@@ -53,7 +53,7 @@ abstract class DuskTestCase extends BaseTestCase
             $chromeOptions[] = '--headless';
         }
 
-        $options = (new ChromeOptions())->addArguments($chromeOptions);
+        $options = (new ChromeOptions)->addArguments($chromeOptions);
 
         $options->setExperimentalOption('mobileEmulation', ['userAgent' => 'laravel/dusk']);
 
