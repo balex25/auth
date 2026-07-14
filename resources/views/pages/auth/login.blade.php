@@ -244,7 +244,7 @@ new class() extends Component
 
                 @if($showPasswordField)
                     <x-auth::elements.input-placeholder value="{{ $email }}">
-                        <button type="button" data-auth="edit-email-button" wire:click="editIdentity" class="font-medium text-orange-600 dark:text-orange-500">{{ $language->login->edit }}</button>
+                        <button type="button" data-auth="edit-email-button" wire:click="editIdentity" class="font-medium text-orange-600 hover:text-orange-700 dark:text-orange-500 dark:hover:text-orange-600">{{ $language->login->edit }}</button>
                     </x-auth::elements.input-placeholder>
                 @else
                     @if($showIdentifierInput)

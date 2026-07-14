@@ -53,6 +53,8 @@ it('provides a preloaded auth background gallery with a config fallback', functi
         ->toContain('rounded-tl-none rounded-r-none')
         ->toContain('shadow-[8px_-8px_0_8px_var(--auth-meta-bg)]')
         ->toContain('data-auth-background-title-link')
+        ->toContain('data-auth-background-linked-title')
+        ->toMatch('/data-auth-background-linked-title[\s\S]+class="shape h4 min-w-0 truncate"/')
         ->toContain('data-auth-background-author-link')
         ->toContain("config('devdojo.auth.appearance.background.image')")
         ->toMatch('/window\.requestAnimationFrame\(\(\) => \{\s+this\.activeBackgroundIndex = index;\s+this\.backgroundTransitioning = true;/')

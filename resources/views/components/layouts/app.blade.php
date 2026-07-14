@@ -371,14 +371,15 @@
                     class="inline-flex max-w-full items-center gap-1 whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-500"
                     data-auth-background-title-link
                 >
-                    <span x-text="currentBackground() ? currentBackground().title : ''" class="min-w-0 truncate"></span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-up-right-icon lucide-move-up-right size-3.5 shrink-0 text-orange-600 dark:text-orange-500" aria-hidden="true"><path d="M13 5H19V11"/><path d="M19 5L5 19"/></svg>
+
+                    <h3
+                        class="inline-flex max-w-full min-w-0 items-center gap-1 overflow-hidden whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
+                        data-auth-background-linked-title
+                    >
+                        <span x-text="currentBackground() ? currentBackground().title : ''" class="shape h4 min-w-0 truncate"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0 text-orange-600 dark:text-orange-500"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    </h3>
                 </a>
-                <h3
-                    x-show="currentBackground() && !currentBackground().link"
-                    x-text="currentBackground() ? currentBackground().title : ''"
-                    class="shape h4 block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
-                ></h3>
                 <p class="mt-0.5 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
 
                     <a
@@ -395,7 +396,7 @@
 
                         <span class="inline-flex min-w-0 items-center gap-1">
                             <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-up-right-icon lucide-move-up-right size-3.5 shrink-0 text-orange-600 dark:text-orange-500" aria-hidden="true"><path d="M13 5H19V11"/><path d="M19 5L5 19"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0 text-orange-600 dark:text-orange-500"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                         </span>
                     </a>
 
