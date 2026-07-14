@@ -1,12 +1,16 @@
 @props(['action'])
 
-@php($turnstileSiteKey = config('services.turnstile.site_key'))
+@php
+    $turnstileSiteKey = config('services.turnstile.site_key');
+    $turnstileLanguage = strtolower(str_replace('_', '-', \Devdojo\Auth\Helper::currentLocale() ?? 'auto'));
+@endphp
 
 @if ($turnstileSiteKey)
     <div
         x-data="{
             siteKey: @js($turnstileSiteKey),
             action: @js($action),
+            language: @js($turnstileLanguage),
             widgetId: null,
             scriptRequested: false,
             pendingSubmit: false,
@@ -79,6 +83,7 @@
                     action: this.action,
                     appearance: 'always',
                     theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                    language: this.language,
                     callback: token => this.setToken(token),
                     'expired-callback': () => this.setToken(''),
                     'error-callback': () => this.setToken(''),

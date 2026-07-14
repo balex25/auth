@@ -1,8 +1,11 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\ViewErrorBag;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -19,6 +22,20 @@ it('lazy loads a visible Turnstile widget on auth pages', function () {
         ->assertSee('requestSubmit()', false)
         ->assertSee('auth_login');
 });
+
+it('renders Turnstile in the locale from the auth URL', function (string $locale) {
+    config()->set('app.locales', ['en', 'es', 'ru']);
+    app()->instance('request', Request::create('/'.$locale.'/auth/login'));
+    view()->share('errors', new ViewErrorBag);
+
+    $html = Blade::render('<x-auth::elements.turnstile action="auth_login" />');
+
+    expect($html)->toContain("language: '{$locale}'");
+})->with([
+    'English' => 'en',
+    'Spanish' => 'es',
+    'Russian' => 'ru',
+]);
 
 it('requires Turnstile before a password authentication attempt', function () {
     Livewire::test('auth.login')
