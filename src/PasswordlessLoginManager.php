@@ -4,6 +4,7 @@ namespace Devdojo\Auth;
 
 use Devdojo\Auth\Notifications\PasswordlessLoginNotification;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -60,6 +61,7 @@ class PasswordlessLoginManager
         }
 
         $expiresAt = now()->addMinutes($this->expiresInMinutes());
+        $locale = $this->notificationLocale($user, $locale);
         $token = Str::random(64);
         $tokenHash = $this->tokenHash($token);
         $userKey = $this->userKey($user->getAuthIdentifier());
@@ -166,5 +168,18 @@ class PasswordlessLoginManager
         $locales = config('app.locales', []);
 
         return is_string($locale) && in_array($locale, $locales, true) ? $locale : null;
+    }
+
+    private function notificationLocale(Authenticatable $user, ?string $fallbackLocale): ?string
+    {
+        if ($user instanceof HasLocalePreference) {
+            $preferredLocale = $this->validLocale($user->preferredLocale());
+
+            if ($preferredLocale !== null) {
+                return $preferredLocale;
+            }
+        }
+
+        return $this->validLocale($fallbackLocale);
     }
 }

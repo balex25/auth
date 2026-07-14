@@ -11,22 +11,22 @@ $hasRequirements = $requireUppercase || $requireNumeric || $requireSpecial || $r
 
 @if(config('devdojo.auth.settings.password_show_requirements', true) && $hasRequirements)
 <div class="text-xs space-y-1 mt-1" style="color: {{ config('devdojo.auth.appearance.color.text') }}; opacity: 0.6;">
-    <p class="font-medium">{{ __('Password must:') }}</p>
+    <p class="font-medium">{{ __('auth.passwordRequirements.must') }}</p>
     <ul class="list-disc list-inside space-y-0.5 pl-1">
         @if($minLength > 0)
-        <li>{{ __('Be at least :length characters', ['length' => $minLength]) }}</li>
+        <li>{{ trans_choice('auth.passwordRequirements.minimum_length', $minLength, ['count' => $minLength]) }}</li>
         @endif
         @if($requireUppercase)
-        <li>{{ __('Include uppercase and lowercase letters') }}</li>
+        <li>{{ __('auth.passwordRequirements.mixed_case') }}</li>
         @endif
         @if($requireNumeric)
-        <li>{{ __('Include at least one number') }}</li>
+        <li>{{ __('auth.passwordRequirements.one_number') }}</li>
         @endif
         @if($requireSpecial)
-        <li>{{ __('Include at least one special character') }}</li>
+        <li>{{ __('auth.passwordRequirements.one_special') }}</li>
         @endif
         @if($requireUncompromised)
-        <li>{{ __('Not be a commonly compromised password') }}</li>
+        <li>{{ __('auth.passwordRequirements.uncompromised') }}</li>
         @endif
     </ul>
 </div>

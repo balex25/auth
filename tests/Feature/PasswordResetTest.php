@@ -48,7 +48,7 @@ it('sends password reset link for valid email', function () {
         ->set('email', 'test@example.com')
         ->call('sendResetPasswordLink')
         ->assertHasNoErrors()
-        ->assertSet('emailSentMessage', trans(Password::RESET_LINK_SENT));
+        ->assertSet('emailSentMessage', __('auth.passwordResetRequest.sent'));
 
     Notification::assertSentTo($user, ResetPassword::class);
 });
@@ -60,7 +60,7 @@ it('returns the generic success response for a non-existent email', function () 
         ->set('email', 'nonexistent@example.com')
         ->call('sendResetPasswordLink')
         ->assertHasNoErrors()
-        ->assertSet('emailSentMessage', trans(Password::RESET_LINK_SENT));
+        ->assertSet('emailSentMessage', __('auth.passwordResetRequest.sent'));
 
     Notification::assertNothingSent();
 });

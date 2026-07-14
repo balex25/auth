@@ -44,7 +44,7 @@ new class() extends Component
             RateLimiter::tooManyAttempts($emailKey, self::MAX_REQUESTS_PER_EMAIL_PER_HOUR)
             || RateLimiter::tooManyAttempts($ipKey, self::MAX_REQUESTS_PER_IP_PER_HOUR)
         ) {
-            $this->emailSentMessage = trans(Password::RESET_LINK_SENT);
+            $this->emailSentMessage = __('auth.passwordResetRequest.sent');
 
             return;
         }
@@ -55,7 +55,7 @@ new class() extends Component
         $response = Password::broker()->sendResetLink(['email' => $normalizedEmail]);
 
         if (in_array($response, [Password::RESET_LINK_SENT, Password::RESET_THROTTLED, Password::INVALID_USER], true)) {
-            $this->emailSentMessage = trans(Password::RESET_LINK_SENT);
+            $this->emailSentMessage = __('auth.passwordResetRequest.sent');
 
             return;
         }

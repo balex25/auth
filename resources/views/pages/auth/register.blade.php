@@ -7,6 +7,7 @@ use Devdojo\Auth\Traits\ValidatesTurnstile;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Volt\Component;
 
 use function Laravel\Folio\middleware;
@@ -135,11 +136,17 @@ new class() extends Component
             'password' => Hash::make($this->password),
         ];
 
+        $userModel = app(config('auth.providers.users.model'));
+
+        if (Schema::hasColumn($userModel->getTable(), 'locale')) {
+            $userData['locale'] = Helper::currentLocale() ?? config('app.locale', 'en');
+        }
+
         if ($this->settings->registration_include_name_field) {
             $userData['name'] = $this->name;
         }
 
-        $user = app(config('auth.providers.users.model'))->create($userData);
+        $user = $userModel->create($userData);
 
         event(new Registered($user));
 

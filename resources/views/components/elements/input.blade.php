@@ -119,7 +119,7 @@
                             type="button"
                             x-on:click="requirementsOpen = ! requirementsOpen"
                             x-bind:aria-expanded="requirementsOpen"
-                            aria-label="{{ __('Password requirements') }}"
+                            aria-label="{{ __('auth.passwordRequirements.label') }}"
                             class="absolute top-3 right-10 inline-flex size-8 items-center justify-center rounded-md transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 dark:focus-visible:ring-orange-500"
                             x-bind:class="meetsPasswordRequirements() ? 'text-green-500' : 'text-red-500'"
                         >
@@ -137,32 +137,32 @@
                             x-transition:leave-end="opacity-0 translate-y-1"
                             class="relative mt-2 w-full rounded-md border border-gray-600 bg-gray-800 p-3 text-xs shadow-sm dark:border-neutral-700 dark:bg-neutral-900"
                         >
-                            <p class="mb-2 font-medium text-gray-200 dark:text-neutral-200">{{ __('Password must contain:') }}</p>
+                            <p class="mb-2 font-medium text-gray-200 dark:text-neutral-200">{{ __('auth.passwordRequirements.must_contain') }}</p>
                             <ul class="grid gap-1.5 text-gray-400 dark:text-neutral-400 sm:grid-cols-2">
                                 <li class="flex items-center gap-2" x-bind:class="meetsMinimumLength() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                                    <span>{{ trans_choice('At least :count character|At least :count characters', $minimumPasswordLength, ['count' => $minimumPasswordLength]) }}</span>
+                                    <span>{{ trans_choice('auth.passwordRequirements.minimum_length', $minimumPasswordLength, ['count' => $minimumPasswordLength]) }}</span>
                                 </li>
                                 @if ($requiresMixedCase)
                                     <li class="flex items-center gap-2" x-bind:class="includesLowercase() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                                        <span>{{ __('One lowercase character') }}</span>
+                                        <span>{{ __('auth.passwordRequirements.one_lowercase') }}</span>
                                     </li>
                                     <li class="flex items-center gap-2" x-bind:class="includesUppercase() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                                        <span>{{ __('One uppercase character') }}</span>
+                                        <span>{{ __('auth.passwordRequirements.one_uppercase') }}</span>
                                     </li>
                                 @endif
                                 @if ($requiresNumber)
                                     <li class="flex items-center gap-2" x-bind:class="includesNumber() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                                        <span>{{ __('One number') }}</span>
+                                        <span>{{ __('auth.passwordRequirements.one_number') }}</span>
                                     </li>
                                 @endif
                                 @if ($requiresSymbol)
                                     <li class="flex items-center gap-2" x-bind:class="includesSymbol() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                                        <span>{{ __('One special character') }}</span>
+                                        <span>{{ __('auth.passwordRequirements.one_special') }}</span>
                                     </li>
                                 @endif
                             </ul>

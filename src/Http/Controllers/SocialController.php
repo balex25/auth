@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialController
@@ -49,6 +50,7 @@ class SocialController
 
     public function callback(Request $request, $driver)
     {
+        $this->restoreStoredLocale();
         $this->dynamicallySetSocialProviderCredentials($driver);
 
         try {
@@ -102,11 +104,18 @@ class SocialController
 
     private function createUser($socialiteUser)
     {
-        return app(config('auth.providers.users.model'))->create([
+        $userModel = app(config('auth.providers.users.model'));
+        $attributes = [
             'name' => $socialiteUser->getName(),
             'email' => $socialiteUser->getEmail(),
             'email_verified_at' => now(),
-        ]);
+        ];
+
+        if (Schema::hasColumn($userModel->getTable(), 'locale')) {
+            $attributes['locale'] = Helper::currentLocale() ?? config('app.locale', 'en');
+        }
+
+        return $userModel->create($attributes);
     }
 
     private function createSocialProviderUser($user, $socialiteUser, $driver)
@@ -123,5 +132,14 @@ class SocialController
             'refresh_token' => $socialiteUser->refreshToken,
             'token_expires_at' => $socialiteUser->expiresIn ? now()->addSeconds($socialiteUser->expiresIn) : null,
         ]);
+    }
+
+    private function restoreStoredLocale(): void
+    {
+        $locale = session()->get('auth.locale');
+
+        if (is_string($locale) && in_array($locale, config('app.locales', [config('app.locale', 'en')]), true)) {
+            app()->setLocale($locale);
+        }
     }
 }
