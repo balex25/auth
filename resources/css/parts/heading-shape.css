@@ -1,0 +1,82 @@
+/** Heading Shape */
+.shape:before {
+	content: "";
+	width: 18px;
+	height: 24px;
+	clip-path: polygon(35% 0%, 100% 0%, 65% 100%, 0% 100%);
+	/*background-color: #f60;*/
+	position: relative;
+	top: 3px;
+	display: inline-block;
+	margin-right: 8px;
+	@apply bg-orange-600;
+}
+
+.dark .shape:before {
+	@apply bg-orange-500;
+}
+
+h1.shape:before,
+.shape.h1:before {
+	height: 26px;
+}
+
+h1.shape.price:before {
+	height: 44px;
+	width: 28px;
+	top: 1px;
+}
+
+h1.shape.page::before {
+	@apply h-6.25 lg:h-7.5
+}
+
+h1.shape.error:before {
+	height: 40px;
+	margin-right: 14px;
+	@apply h-6 md:h-7.5 lg:h-10;
+}
+
+h3.shape:before,
+.shape.h3:before {
+	width: 14px;
+	height: 19px;
+	top: 2px;
+	margin-right: 6px;
+}
+
+h4.shape::before,
+.shape.h4:before {
+	width: 10px;
+	height: 14px;
+	top:1px;
+}
+
+.shape.h4.sv:before {
+	margin-right: 5px;
+}
+
+.shape.h4.stats:before {
+	width: 7px;
+	top: 2px;
+}
+
+
+.shape.h4.table:before,
+.shape2t::before {
+	top: 2px;
+}
+
+.shape.h4.collection:before {
+	width: 9px;
+  top: 1px;
+  margin-right: 6px;
+  height: 12px;
+}
+
+.shape.h4.dl:before {
+	width: 8px;
+	height: 14px;
+	top: 0px;
+	margin-right: 6px;
+}

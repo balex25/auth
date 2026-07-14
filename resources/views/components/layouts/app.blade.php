@@ -146,7 +146,6 @@
                         return;
                     }
 
-                    this.backgroundMetaVisible = false;
                     this.nextBackgroundUrl = image.url;
                     this.backgroundTransitioning = false;
                     this.$nextTick(() => {
@@ -366,24 +365,35 @@
                 <a
                     x-show="currentBackground() && currentBackground().link"
                     x-bind:href="currentBackground() ? currentBackground().link : null"
-                    x-text="currentBackground() ? currentBackground().title : ''"
-                    class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-400"
-                ></a>
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex max-w-full items-center gap-1 whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-400"
+                    data-auth-background-title-link
+                >
+                    <span x-text="currentBackground() ? currentBackground().title : ''" class="min-w-0 truncate"></span>
+                    <span aria-hidden="true" class="shrink-0 text-[0.8em] text-orange-600 dark:text-orange-400">↗</span>
+                </a>
                 <h3
                     x-show="currentBackground() && !currentBackground().link"
                     x-text="currentBackground() ? currentBackground().title : ''"
-                    class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
+                    class="shape h4 block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
                 ></h3>
                 <p class="mt-0.5 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 overflow-hidden whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
                     <a
                         x-show="currentBackground() && currentBackground().author_url"
                         x-bind:href="currentBackground() ? currentBackground().author_url : null"
-                        class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-400"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group inline-flex min-w-0 items-center gap-1.5 overflow-hidden text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-500"
+                        data-auth-background-author-link
                     >
-                        <span class="inline-flex size-4 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
-                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
+                        <span class="inline-flex size-4 shrink-0 rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
+                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover transition-transform duration-150 ease-linear group-hover:scale-110">
                         </span>
-                        <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                        <span class="inline-flex min-w-0 items-center gap-1">
+                            <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                            <span aria-hidden="true" class="shrink-0 text-orange-600 dark:text-orange-500">↗</span>
+                        </span>
                     </a>
                     <span x-show="currentBackground() && !currentBackground().author_url" class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden">
                         <span class="inline-flex size-4 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
@@ -400,7 +410,7 @@
                     aria-hidden="true"
                 >
                     <span
-                        class="block size-full origin-left bg-orange-500 will-change-transform"
+                        class="block size-full origin-left bg-orange-600 dark:bg-orange-500 will-change-transform"
                         x-bind:style="'transform: scaleX(' + autoplayProgress + '); transform-origin: left center'"
                     ></span>
                 </div>
