@@ -45,8 +45,15 @@ it('provides a preloaded auth background gallery with a config fallback', functi
         ->toContain('loader.decode()')
         ->toContain('preloadNextBackground()')
         ->toContain('updateBackgroundBlur($event)')
-        ->toContain("backgroundBlurred ? 'blur-md scale-[1.02]' : 'blur-0 scale-100'")
+        ->toContain("backgroundBlurred ? 'blur-xs' : 'blur-0'")
+        ->toContain('nextBackgroundUrl')
+        ->toContain('backgroundTransitioning')
+        ->toContain('autoplayProgress')
+        ->toContain("'transform: scaleX(' + autoplayProgress")
+        ->toContain('rounded-tl-none rounded-r-none')
+        ->toContain('shadow-[8px_-8px_0_8px_var(--auth-meta-bg)]')
         ->toContain("config('devdojo.auth.appearance.background.image')")
+        ->not->toContain("backgroundBlurred ? 'blur-md scale-[1.02]' : 'blur-0 scale-100'")
         ->not->toContain('https://beamngmods.test/en/profile/hana')
         ->not->toContain('Media 1-1');
 });

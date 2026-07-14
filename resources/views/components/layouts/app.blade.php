@@ -48,12 +48,16 @@
             backgroundImages: @js($authBackgroundImages),
             activeBackgroundIndex: 0,
             backgroundUrl: @js($initialBackgroundImage),
+            nextBackgroundUrl: null,
             backgroundBlurred: true,
-            backgroundVisible: true,
+            backgroundTransitioning: false,
             backgroundMetaVisible: false,
-            backgroundTimer: null,
             preloadedBackgrounds: {},
             failedBackgrounds: {},
+            autoplayDuration: 5500,
+            autoplayFrame: null,
+            autoplayStartedAt: null,
+            autoplayProgress: 0,
             prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
             currentBackground() {
                 return this.backgroundImages[this.activeBackgroundIndex] || null;
@@ -63,15 +67,11 @@
                     return;
                 }
 
-                this.activateBackground(0, true);
-
-                if (this.backgroundImages.length > 1 && !this.prefersReducedMotion) {
-                    this.backgroundTimer = window.setInterval(() => this.showNextBackground(), 15000);
-                }
+                this.activateBackground(0);
             },
             destroy() {
-                if (this.backgroundTimer) {
-                    window.clearInterval(this.backgroundTimer);
+                if (this.autoplayFrame) {
+                    window.cancelAnimationFrame(this.autoplayFrame);
                 }
             },
             updateBackgroundBlur(event) {
@@ -123,28 +123,43 @@
                 };
                 loader.src = image.url;
             },
-            activateBackground(index, isInitial = false) {
+            activateBackground(index) {
                 this.preloadBackground(index, () => {
-                    const swap = () => {
+                    const image = this.backgroundImages[index];
+                    const shouldCrossfade = !this.prefersReducedMotion
+                        && this.backgroundUrl
+                        && this.backgroundUrl !== image.url;
+                    const finishSwap = () => {
                         this.activeBackgroundIndex = index;
-                        this.backgroundUrl = this.backgroundImages[index].url;
+                        this.backgroundUrl = image.url;
+                        this.nextBackgroundUrl = null;
+                        this.backgroundTransitioning = false;
                         this.backgroundMetaVisible = true;
-                        this.backgroundVisible = true;
                         this.preloadNextBackground();
+                        this.startAutoplay();
                     };
 
-                    if (isInitial || this.prefersReducedMotion) {
-                        swap();
+                    this.stopAutoplay();
+
+                    if (!shouldCrossfade) {
+                        finishSwap();
                         return;
                     }
 
-                    this.backgroundVisible = false;
-                    window.setTimeout(swap, 200);
+                    this.backgroundMetaVisible = false;
+                    this.nextBackgroundUrl = image.url;
+                    this.backgroundTransitioning = false;
+                    this.$nextTick(() => {
+                        window.requestAnimationFrame(() => {
+                            this.backgroundTransitioning = true;
+                            window.setTimeout(finishSwap, 500);
+                        });
+                    });
                 }, () => {
                     const nextIndex = this.nextAvailableBackgroundIndex(index);
 
                     if (nextIndex !== null) {
-                        this.activateBackground(nextIndex, true);
+                        this.activateBackground(nextIndex);
                     }
                 });
             },
@@ -177,6 +192,38 @@
                 if (nextIndex !== null && nextIndex !== this.activeBackgroundIndex) {
                     this.activateBackground(nextIndex);
                 }
+            },
+            startAutoplay() {
+                if (this.backgroundImages.length < 2 || this.prefersReducedMotion || this.autoplayFrame) {
+                    return;
+                }
+
+                this.autoplayProgress = 0;
+                this.autoplayStartedAt = performance.now();
+                this.autoplayFrame = window.requestAnimationFrame(timestamp => this.tickAutoplay(timestamp));
+            },
+            stopAutoplay() {
+                if (this.autoplayFrame) {
+                    window.cancelAnimationFrame(this.autoplayFrame);
+                }
+
+                this.autoplayFrame = null;
+                this.autoplayStartedAt = null;
+            },
+            tickAutoplay(timestamp) {
+                if (this.autoplayStartedAt === null) {
+                    this.autoplayStartedAt = timestamp;
+                }
+
+                this.autoplayProgress = Math.min((timestamp - this.autoplayStartedAt) / this.autoplayDuration, 1);
+
+                if (this.autoplayProgress >= 1) {
+                    this.autoplayFrame = null;
+                    this.showNextBackground();
+                    return;
+                }
+
+                this.autoplayFrame = window.requestAnimationFrame(nextTimestamp => this.tickAutoplay(nextTimestamp));
             }
         }"
         x-init="initBackgroundGallery()"
@@ -285,13 +332,21 @@
                 <img
                     src="{{ $initialBackgroundImage }}"
                     x-bind:src="backgroundUrl"
-                    x-bind:class="[
-                        backgroundBlurred ? 'blur-md scale-[1.02]' : 'blur-0 scale-100',
-                        backgroundVisible ? 'opacity-100' : 'opacity-0'
-                    ]"
+                    x-bind:class="backgroundBlurred ? 'blur-xs' : 'blur-0'"
                     id="auth-background-image"
                     alt=""
-                    class="absolute inset-0 size-full object-cover object-[bottom_center] transition-[filter,transform,opacity] duration-500 ease-out motion-reduce:transition-none"
+                    class="absolute inset-0 size-full object-cover object-[bottom_center] transition-[filter] duration-500 ease-out motion-reduce:transition-none"
+                />
+                <img
+                    x-cloak
+                    x-show="nextBackgroundUrl"
+                    x-bind:src="nextBackgroundUrl"
+                    x-bind:class="[
+                        backgroundBlurred ? 'blur-xs' : 'blur-0',
+                        backgroundTransitioning ? 'opacity-100' : 'opacity-0'
+                    ]"
+                    alt=""
+                    class="absolute inset-0 size-full object-cover object-[bottom_center] transition-[filter,opacity] duration-500 ease-out motion-reduce:transition-none"
                 />
                 <div id="auth-background-image-overlay" class="pointer-events-none absolute inset-0 bg-black/5"></div>
             </div>
@@ -301,38 +356,55 @@
             x-cloak
             x-show="backgroundMetaVisible && currentBackground()"
             x-transition.opacity.duration.200ms
-            class="fixed top-4 right-4 z-40 min-w-0 max-w-xs rounded-lg border border-gray-200 bg-white/95 px-3 py-2 text-left text-gray-900 shadow-md backdrop-blur-sm max-[848px]:hidden dark:border-neutral-700 dark:bg-neutral-800/95 dark:text-white"
+            class="pointer-events-auto fixed top-0 right-0 z-40 box-border w-max max-w-[min(22rem,calc(100vw-1rem))] rounded-xl rounded-tl-none rounded-r-none bg-gray-50 p-0.5 pt-px pr-px [--auth-meta-bg:var(--color-gray-50)] max-[848px]:hidden dark:bg-neutral-900 dark:[--auth-meta-bg:var(--color-neutral-900)]"
             data-auth-background-meta
         >
-            <a
-                x-show="currentBackground() && currentBackground().link"
-                x-bind:href="currentBackground() ? currentBackground().link : null"
-                x-text="currentBackground() ? currentBackground().title : ''"
-                class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-400"
-            ></a>
-            <h3
-                x-show="currentBackground() && !currentBackground().link"
-                x-text="currentBackground() ? currentBackground().title : ''"
-                class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
-            ></h3>
-            <p class="mt-1 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 overflow-hidden whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
+            <span aria-hidden="true" class="pointer-events-none absolute -left-4 top-0 size-4 rounded-tr-xl shadow-[8px_-8px_0_8px_var(--auth-meta-bg)]"></span>
+            <span aria-hidden="true" class="pointer-events-none absolute right-0 -bottom-4 size-4 rounded-tr-xl shadow-[8px_-8px_0_8px_var(--auth-meta-bg)]"></span>
+
+            <div class="relative z-10 m-1 min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-white px-3 py-2 pb-3 text-left text-gray-900 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                 <a
-                    x-show="currentBackground() && currentBackground().author_url"
-                    x-bind:href="currentBackground() ? currentBackground().author_url : null"
-                    class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-400"
+                    x-show="currentBackground() && currentBackground().link"
+                    x-bind:href="currentBackground() ? currentBackground().link : null"
+                    x-text="currentBackground() ? currentBackground().title : ''"
+                    class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-400"
+                ></a>
+                <h3
+                    x-show="currentBackground() && !currentBackground().link"
+                    x-text="currentBackground() ? currentBackground().title : ''"
+                    class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
+                ></h3>
+                <p class="mt-0.5 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 overflow-hidden whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
+                    <a
+                        x-show="currentBackground() && currentBackground().author_url"
+                        x-bind:href="currentBackground() ? currentBackground().author_url : null"
+                        class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-400"
+                    >
+                        <span class="inline-flex size-4 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
+                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
+                        </span>
+                        <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                    </a>
+                    <span x-show="currentBackground() && !currentBackground().author_url" class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden">
+                        <span class="inline-flex size-4 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
+                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
+                        </span>
+                        <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                    </span>
+                </p>
+
+                <div
+                    x-cloak
+                    x-show="backgroundImages.length > 1 && !prefersReducedMotion"
+                    class="pointer-events-none absolute inset-x-0 bottom-0 h-1 overflow-hidden bg-gray-200/70 dark:bg-neutral-700/70"
+                    aria-hidden="true"
                 >
-                    <span class="inline-flex size-5 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
-                        <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
-                    </span>
-                    <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
-                </a>
-                <span x-show="currentBackground() && !currentBackground().author_url" class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden">
-                    <span class="inline-flex size-5 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
-                        <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
-                    </span>
-                    <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
-                </span>
-            </p>
+                    <span
+                        class="block size-full origin-left bg-orange-500 will-change-transform"
+                        x-bind:style="'transform: scaleX(' + autoplayProgress + '); transform-origin: left center'"
+                    ></span>
+                </div>
+            </div>
         </div>
 
         @php
