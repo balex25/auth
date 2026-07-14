@@ -4,11 +4,7 @@
 
 <title>{{ $title ?? 'Auth' }}</title>
 <meta name="description" content="{{ __('auth.login.description') }}">
-<meta name="canonical" content="{{ url()->current() }}" />
-
-@if(!empty(request()->query())) 
-    <meta name="robots" content="noindex, follow">
-@endif
+@include('auth::includes.seo')
 
 @if(config('devdojo.auth.settings.dev_mode'))
     @vite(['packages/devdojo/auth/resources/css/auth.css', 'packages/devdojo/auth/resources/css/auth.js'])

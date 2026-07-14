@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>Authentication Setup</title>
+        @include('auth::includes.seo', ['authSeoForceNoindex' => true])
         @if(config('devdojo.auth.settings.dev_mode'))
             @vite(['packages/devdojo/auth/resources/css/auth.css', 'packages/devdojo/auth/resources/css/auth.js'])
         @else
