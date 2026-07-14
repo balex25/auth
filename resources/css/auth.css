@@ -41,3 +41,22 @@ input.auth-component-code-input::-webkit-inner-spin-button {
 button[data-auth="passwordless-login-button"] {
   @apply -mt-2
 }
+
+input.auth-component-input:-webkit-autofill,
+input.auth-component-input:-webkit-autofill:hover,
+input.auth-component-input:-webkit-autofill:focus,
+input.auth-component-input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--color-gray-100);
+  caret-color: var(--color-gray-100);
+  box-shadow: 0 0 0 1000px var(--color-gray-800) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+.dark input.auth-component-input:-webkit-autofill,
+.dark input.auth-component-input:-webkit-autofill:hover,
+.dark input.auth-component-input:-webkit-autofill:focus,
+.dark input.auth-component-input:-webkit-autofill:active {
+  -webkit-text-fill-color: white;
+  caret-color: white;
+  box-shadow: 0 0 0 1000px black inset;
+}
