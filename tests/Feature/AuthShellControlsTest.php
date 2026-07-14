@@ -55,11 +55,14 @@ it('provides a preloaded auth background gallery with a config fallback', functi
         ->toContain('data-auth-background-title-link')
         ->toContain('data-auth-background-author-link')
         ->toContain("config('devdojo.auth.appearance.background.image')")
+        ->toMatch('/window\.requestAnimationFrame\(\(\) => \{\s+this\.activeBackgroundIndex = index;\s+this\.backgroundTransitioning = true;/')
         ->not->toContain('this.backgroundMetaVisible = false')
         ->not->toContain("backgroundBlurred ? 'blur-md scale-[1.02]' : 'blur-0 scale-100'")
         ->not->toContain('https://beamngmods.test/en/profile/hana')
         ->not->toContain('Media 1-1');
 
     expect(substr_count($layout, 'rel="noopener noreferrer"'))->toBe(2)
-        ->and(substr_count($layout, '>↗</span>'))->toBe(2);
+        ->and(substr_count($layout, 'lucide-move-up-right-icon'))->toBe(2)
+        ->and(substr_count($layout, '<path d="M13 5H19V11"/>'))->toBe(2)
+        ->and(substr_count($layout, '<path d="M19 5L5 19"/>'))->toBe(2);
 });

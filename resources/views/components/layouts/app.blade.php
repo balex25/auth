@@ -150,6 +150,7 @@
                     this.backgroundTransitioning = false;
                     this.$nextTick(() => {
                         window.requestAnimationFrame(() => {
+                            this.activeBackgroundIndex = index;
                             this.backgroundTransitioning = true;
                             window.setTimeout(finishSwap, 500);
                         });
@@ -367,40 +368,44 @@
                     x-bind:href="currentBackground() ? currentBackground().link : null"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex max-w-full items-center gap-1 whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-400"
+                    class="inline-flex max-w-full items-center gap-1 whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-500"
                     data-auth-background-title-link
                 >
                     <span x-text="currentBackground() ? currentBackground().title : ''" class="min-w-0 truncate"></span>
-                    <span aria-hidden="true" class="shrink-0 text-[0.8em] text-orange-600 dark:text-orange-400">↗</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-up-right-icon lucide-move-up-right size-3.5 shrink-0 text-orange-600 dark:text-orange-500" aria-hidden="true"><path d="M13 5H19V11"/><path d="M19 5L5 19"/></svg>
                 </a>
                 <h3
                     x-show="currentBackground() && !currentBackground().link"
                     x-text="currentBackground() ? currentBackground().title : ''"
                     class="shape h4 block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
                 ></h3>
-                <p class="mt-0.5 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 overflow-hidden whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
+                <p class="mt-0.5 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
+
                     <a
                         x-show="currentBackground() && currentBackground().author_url"
                         x-bind:href="currentBackground() ? currentBackground().author_url : null"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="group inline-flex min-w-0 items-center gap-1.5 overflow-hidden text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-500"
+                        class="group inline-flex min-w-0 items-center gap-1.5 text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-500"
                         data-auth-background-author-link
                     >
-                        <span class="inline-flex size-4 shrink-0 rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
-                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover transition-transform duration-150 ease-linear group-hover:scale-110">
+                        <span class="inline-flex size-4 shrink-0 rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600 transition-transform duration-150 ease-linear group-hover:scale-110">
+                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover rounded-full overflow-hidden">
                         </span>
+
                         <span class="inline-flex min-w-0 items-center gap-1">
                             <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
-                            <span aria-hidden="true" class="shrink-0 text-orange-600 dark:text-orange-500">↗</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-up-right-icon lucide-move-up-right size-3.5 shrink-0 text-orange-600 dark:text-orange-500" aria-hidden="true"><path d="M13 5H19V11"/><path d="M19 5L5 19"/></svg>
                         </span>
                     </a>
-                    <span x-show="currentBackground() && !currentBackground().author_url" class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden">
-                        <span class="inline-flex size-4 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
-                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
+
+                    <span x-show="currentBackground() && !currentBackground().author_url" class="inline-flex min-w-0 items-center gap-1.5">
+                        <span class="inline-flex size-4 shrink-0 rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
+                            <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover rounded-full overflow-hidden">
                         </span>
                         <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
                     </span>
+
                 </p>
 
                 <div
