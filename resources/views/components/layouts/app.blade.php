@@ -29,7 +29,7 @@
     @endphp
     <div x-data data-auth="{{ $dyanicPageId }}" class="relative w-full h-full" x-cloak>
 
-        <div class="hidden sm:flex fixed bottom-5 right-5 z-40 items-center gap-2" data-auth-footer-controls>
+        <div class="flex fixed bottom-5 right-5 z-40 items-center gap-2" data-auth-footer-controls>
             <a href="{{ \Devdojo\Auth\Helper::localizedUrl('/') }}" class="inline-flex min-h-9 items-center justify-center rounded-lg border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white shadow-md backdrop-blur-md transition hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70 active:scale-95">
                 <svg class="mr-1 -ml-1 size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span>{{ __('auth.layout.back_to_website') }}</span>
