@@ -33,3 +33,20 @@ it('provides locale and theme controls beside the back link', function () {
         ->toContain("window.addEventListener('theme-change'")
         ->toContain("window.dispatchEvent(new CustomEvent('theme-synced'");
 });
+
+it('provides a preloaded auth background gallery with a config fallback', function () {
+    $layout = File::get(dirname(__DIR__, 2).'/resources/views/components/layouts/app.blade.php');
+
+    expect(Blade::compileString($layout))->not->toBeEmpty();
+
+    expect($layout)
+        ->toContain('data-auth-background-meta')
+        ->toContain('backgroundImages: @js($authBackgroundImages)')
+        ->toContain('loader.decode()')
+        ->toContain('preloadNextBackground()')
+        ->toContain('updateBackgroundBlur($event)')
+        ->toContain("backgroundBlurred ? 'blur-md scale-[1.02]' : 'blur-0 scale-100'")
+        ->toContain("config('devdojo.auth.appearance.background.image')")
+        ->not->toContain('https://beamngmods.test/en/profile/hana')
+        ->not->toContain('Media 1-1');
+});

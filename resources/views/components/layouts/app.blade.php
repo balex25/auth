@@ -26,8 +26,166 @@
         }
 
         $localePathSuffix = $pathSegments === [] ? '' : '/'.implode('/', $pathSegments);
+        $authBackgroundImages = collect($authBackgroundImages ?? [])
+            ->filter(fn (mixed $image): bool => is_array($image) && filled($image['url'] ?? null))
+            ->map(fn (array $image): array => [
+                'url' => (string) $image['url'],
+                'title' => (string) ($image['title'] ?? ''),
+                'link' => filled($image['link'] ?? null) ? (string) $image['link'] : null,
+                'author_name' => (string) ($image['author_name'] ?? ''),
+                'author_url' => filled($image['author_url'] ?? null) ? (string) $image['author_url'] : null,
+                'author_avatar' => (string) ($image['author_avatar'] ?? ''),
+            ])
+            ->values()
+            ->all();
+        $fallbackBackgroundImage = config('devdojo.auth.appearance.background.image');
+        $initialBackgroundImage = filled($fallbackBackgroundImage)
+            ? (string) $fallbackBackgroundImage
+            : data_get($authBackgroundImages, '0.url');
     @endphp
-    <div x-data data-auth="{{ $dyanicPageId }}" class="relative w-full h-full" x-cloak>
+    <div
+        x-data="{
+            backgroundImages: @js($authBackgroundImages),
+            activeBackgroundIndex: 0,
+            backgroundUrl: @js($initialBackgroundImage),
+            backgroundBlurred: true,
+            backgroundVisible: true,
+            backgroundMetaVisible: false,
+            backgroundTimer: null,
+            preloadedBackgrounds: {},
+            failedBackgrounds: {},
+            prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+            currentBackground() {
+                return this.backgroundImages[this.activeBackgroundIndex] || null;
+            },
+            initBackgroundGallery() {
+                if (this.backgroundImages.length === 0) {
+                    return;
+                }
+
+                this.activateBackground(0, true);
+
+                if (this.backgroundImages.length > 1 && !this.prefersReducedMotion) {
+                    this.backgroundTimer = window.setInterval(() => this.showNextBackground(), 15000);
+                }
+            },
+            destroy() {
+                if (this.backgroundTimer) {
+                    window.clearInterval(this.backgroundTimer);
+                }
+            },
+            updateBackgroundBlur(event) {
+                const authContainer = document.getElementById('auth-container-parent');
+
+                if (!authContainer || window.innerWidth <= 848) {
+                    this.backgroundBlurred = true;
+                    return;
+                }
+
+                const rect = authContainer.getBoundingClientRect();
+                this.backgroundBlurred = event.clientX >= rect.left
+                    && event.clientX <= rect.right
+                    && event.clientY >= rect.top
+                    && event.clientY <= rect.bottom;
+            },
+            preloadBackground(index, onReady, onError = null) {
+                const image = this.backgroundImages[index];
+
+                if (!image) {
+                    return;
+                }
+
+                if (this.preloadedBackgrounds[image.url]) {
+                    onReady();
+                    return;
+                }
+
+                const loader = new Image();
+                const ready = () => {
+                    this.preloadedBackgrounds[image.url] = true;
+                    onReady();
+                };
+
+                loader.onload = () => {
+                    if (typeof loader.decode !== 'function') {
+                        ready();
+                        return;
+                    }
+
+                    loader.decode().catch(() => {}).finally(ready);
+                };
+                loader.onerror = () => {
+                    this.failedBackgrounds[image.url] = true;
+
+                    if (onError) {
+                        onError();
+                    }
+                };
+                loader.src = image.url;
+            },
+            activateBackground(index, isInitial = false) {
+                this.preloadBackground(index, () => {
+                    const swap = () => {
+                        this.activeBackgroundIndex = index;
+                        this.backgroundUrl = this.backgroundImages[index].url;
+                        this.backgroundMetaVisible = true;
+                        this.backgroundVisible = true;
+                        this.preloadNextBackground();
+                    };
+
+                    if (isInitial || this.prefersReducedMotion) {
+                        swap();
+                        return;
+                    }
+
+                    this.backgroundVisible = false;
+                    window.setTimeout(swap, 200);
+                }, () => {
+                    const nextIndex = this.nextAvailableBackgroundIndex(index);
+
+                    if (nextIndex !== null) {
+                        this.activateBackground(nextIndex, true);
+                    }
+                });
+            },
+            nextAvailableBackgroundIndex(index) {
+                for (let offset = 1; offset <= this.backgroundImages.length; offset++) {
+                    const candidateIndex = (index + offset) % this.backgroundImages.length;
+                    const candidate = this.backgroundImages[candidateIndex];
+
+                    if (candidate && !this.failedBackgrounds[candidate.url]) {
+                        return candidateIndex;
+                    }
+                }
+
+                return null;
+            },
+            preloadNextBackground() {
+                if (this.backgroundImages.length < 2) {
+                    return;
+                }
+
+                const nextIndex = this.nextAvailableBackgroundIndex(this.activeBackgroundIndex);
+
+                if (nextIndex !== null && nextIndex !== this.activeBackgroundIndex) {
+                    this.preloadBackground(nextIndex, () => {});
+                }
+            },
+            showNextBackground() {
+                const nextIndex = this.nextAvailableBackgroundIndex(this.activeBackgroundIndex);
+
+                if (nextIndex !== null && nextIndex !== this.activeBackgroundIndex) {
+                    this.activateBackground(nextIndex);
+                }
+            }
+        }"
+        x-init="initBackgroundGallery()"
+        x-on:pointermove.window="updateBackgroundBlur($event)"
+        x-on:blur.window="backgroundBlurred = true"
+        data-auth="{{ $dyanicPageId }}"
+        class="relative w-full h-full"
+        x-cloak
+    >
 
         <div class="flex fixed bottom-5 right-5 z-40 items-center gap-2 max-[848px]:left-8" data-auth-footer-controls>
             <a href="{{ \Devdojo\Auth\Helper::localizedUrl('/') }}" class="inline-flex min-h-9 items-center justify-center rounded-lg border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white shadow-md backdrop-blur-md transition hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70 active:scale-95 max-[848px]:border-transparent max-[848px]:bg-transparent max-[848px]:hover:bg-white/10">
@@ -122,10 +280,60 @@
             </div>
         </div>
 
-        @if(config('devdojo.auth.appearance.background.image'))
-            <img src="{{ config('devdojo.auth.appearance.background.image') }}" id="auth-background-image" class="blur-md object-cover object-[bottom_center] absolute z-10 w-screen h-screen" />
-            <div id="auth-background-image-overlay" class="absolute inset-0 z-20 w-screen h-screen blur-md"></div>
+        @if(filled($initialBackgroundImage))
+            <div id="auth-background-wrapper" class="absolute inset-0 z-10 overflow-hidden" aria-hidden="true">
+                <img
+                    src="{{ $initialBackgroundImage }}"
+                    x-bind:src="backgroundUrl"
+                    x-bind:class="[
+                        backgroundBlurred ? 'blur-md scale-[1.02]' : 'blur-0 scale-100',
+                        backgroundVisible ? 'opacity-100' : 'opacity-0'
+                    ]"
+                    id="auth-background-image"
+                    alt=""
+                    class="absolute inset-0 size-full object-cover object-[bottom_center] transition-[filter,transform,opacity] duration-500 ease-out motion-reduce:transition-none"
+                />
+                <div id="auth-background-image-overlay" class="pointer-events-none absolute inset-0 bg-black/5"></div>
+            </div>
         @endif
+
+        <div
+            x-cloak
+            x-show="backgroundMetaVisible && currentBackground()"
+            x-transition.opacity.duration.200ms
+            class="fixed top-4 right-4 z-40 min-w-0 max-w-xs rounded-lg border border-gray-200 bg-white/95 px-3 py-2 text-left text-gray-900 shadow-md backdrop-blur-sm max-[848px]:hidden dark:border-neutral-700 dark:bg-neutral-800/95 dark:text-white"
+            data-auth-background-meta
+        >
+            <a
+                x-show="currentBackground() && currentBackground().link"
+                x-bind:href="currentBackground() ? currentBackground().link : null"
+                x-text="currentBackground() ? currentBackground().title : ''"
+                class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:text-base dark:hover:text-orange-400"
+            ></a>
+            <h3
+                x-show="currentBackground() && !currentBackground().link"
+                x-text="currentBackground() ? currentBackground().title : ''"
+                class="block max-w-full truncate whitespace-nowrap text-sm font-bold leading-tight sm:text-base"
+            ></h3>
+            <p class="mt-1 flex max-w-full min-w-0 flex-nowrap items-center gap-x-2 overflow-hidden whitespace-nowrap text-[11px] font-semibold text-gray-600 sm:text-xs dark:text-neutral-300">
+                <a
+                    x-show="currentBackground() && currentBackground().author_url"
+                    x-bind:href="currentBackground() ? currentBackground().author_url : null"
+                    class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden text-gray-700 transition-colors hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-neutral-200 dark:hover:text-orange-400"
+                >
+                    <span class="inline-flex size-5 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
+                        <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
+                    </span>
+                    <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                </a>
+                <span x-show="currentBackground() && !currentBackground().author_url" class="inline-flex min-w-0 items-center gap-1.5 overflow-hidden">
+                    <span class="inline-flex size-5 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:bg-neutral-700 dark:ring-neutral-600">
+                        <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover">
+                    </span>
+                    <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                </span>
+            </p>
+        </div>
 
         @php
             $slotParentClasses = match(config('devdojo.auth.appearance.alignment.container')){
