@@ -10,7 +10,7 @@
     }
 
     $authSeoPathSuffix = $authSeoPathSegments === [] ? '' : '/'.implode('/', $authSeoPathSegments);
-    $authSeoDefaultLocale = config('app.locale', 'en');
+    $authSeoDefaultLocale = 'en';
 @endphp
 
 @if ($authSeoIsNoindex)

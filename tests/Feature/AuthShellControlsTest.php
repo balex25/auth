@@ -35,7 +35,7 @@ it('defines conditional auth robots canonical and hreflang rules', function () {
 
 it('renders indexable canonical metadata and hreflang links for clean auth requests', function (string $url, string $pathSuffix) {
     config()->set('app.locales', ['en', 'es', 'ru']);
-    config()->set('app.locale', 'en');
+    config()->set('app.locale', 'ru');
 
     $request = Request::create('https://beamngmods.test'.$url);
     app()->instance('request', $request);
