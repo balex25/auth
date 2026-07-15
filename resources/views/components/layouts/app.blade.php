@@ -236,7 +236,7 @@
     >
 
         <div class="flex fixed bottom-5 left-8 z-40 items-center gap-2 w-[calc(100%-4rem)] sm:max-w-[calc(var(--container-md)-4rem)]" data-auth-footer-controls>
-            <a href="{{ \Devdojo\Auth\Helper::localizedUrl('/') }}" class="inline-flex min-h-9 items-center justify-center rounded-lg border border-transparent bg-transparent px-2.5 py-1.5 text-xs font-medium text-white shadow-md backdrop-blur-md transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70 active:scale-95">
+            <a href="{{ \Devdojo\Auth\Helper::localizedUrl('/') }}" class="inline-flex min-h-9 items-center justify-center rounded-lg border border-transparent bg-transparent px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70 active:scale-95">
                 <svg class="mr-1 -ml-1 size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span>{{ __('auth.layout.back_to_website') }}</span>
             </a>
@@ -262,7 +262,7 @@
                 }"
                 x-on:keydown.escape.window="open = false"
             >
-                <button type="button" class="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-transparent bg-transparent px-2.5 py-2 text-xs font-semibold text-white shadow-md backdrop-blur-md transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70" x-on:click="open = !open" x-bind:aria-expanded="open.toString()" aria-haspopup="menu" aria-label="{{ __('header.dropdown.language') }}">
+                <button type="button" class="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-transparent bg-transparent px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70" x-on:click="open = !open" x-bind:aria-expanded="open.toString()" aria-haspopup="menu" aria-label="{{ __('header.dropdown.language') }}">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
                     <span>{{ strtoupper($currentLocale) }}</span>
                     <svg class="size-3.5 transition" x-bind:class="open ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
@@ -302,7 +302,7 @@
                 x-init="window.addEventListener('theme-synced', (event) => { theme = event.detail; })"
                 x-on:keydown.escape.window="open = false"
             >
-                <button type="button" class="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-transparent bg-transparent px-2.5 py-2 text-xs font-semibold text-white shadow-md backdrop-blur-md transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70" x-on:click="open = !open" x-bind:aria-expanded="open.toString()" aria-haspopup="menu" aria-label="{{ __('header.dropdown.dark_mode') }}">
+                <button type="button" class="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-transparent bg-transparent px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/70" x-on:click="open = !open" x-bind:aria-expanded="open.toString()" aria-haspopup="menu" aria-label="{{ __('header.dropdown.dark_mode') }}">
                     <svg class="size-4" x-show="theme === 'light'" x-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
                     <svg class="size-4" x-show="theme === 'dark'" x-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                     <svg class="size-4" x-show="theme === 'system'" x-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
