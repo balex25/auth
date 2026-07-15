@@ -3,19 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
-use Illuminate\View\Component;
-
-final class AuthShellVerifiedBadge extends Component
-{
-    public function render(): string
-    {
-        return '<span></span>';
-    }
-}
-
-beforeEach(function (): void {
-    Blade::component(AuthShellVerifiedBadge::class, 'marketing.elements.verified-badge');
-});
 
 it('defines conditional auth robots canonical and hreflang rules', function () {
     $head = File::get(dirname(__DIR__, 2).'/resources/views/includes/head.blade.php');
@@ -167,7 +154,7 @@ it('provides a preloaded auth background gallery with a config fallback', functi
         ->toContain('data-auth-background-author-link')
         ->toContain("'author_verified' => (bool) (\$image['author_verified'] ?? false)")
         ->toContain('currentBackground().author_verified')
-        ->toContain('<x-marketing.elements.verified-badge />')
+        ->toContain('<x-auth::elements.verified-badge />')
         ->toContain("config('devdojo.auth.appearance.background.image')")
         ->toMatch('/window\.requestAnimationFrame\(\(\) => \{\s+this\.activeBackgroundIndex = index;\s+this\.backgroundTransitioning = true;/')
         ->not->toContain('this.backgroundMetaVisible = false')
@@ -180,4 +167,15 @@ it('provides a preloaded auth background gallery with a config fallback', functi
         ->and(substr_count($layout, '<path d="M15 3h6v6"/>'))->toBe(2)
         ->and(substr_count($layout, '<path d="M10 14 21 3"/>'))->toBe(2)
         ->and(substr_count($layout, '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>'))->toBe(2);
+});
+
+it('renders the auth-owned verified badge with the shared visual variants', function () {
+    $html = Blade::render('<x-auth::elements.verified-badge label="Verified creator" size="md" data-verified-badge />');
+
+    expect($html)
+        ->toContain('data-verified-badge')
+        ->toContain('title="Verified creator"')
+        ->toContain('size-4 mt-0')
+        ->toContain('fill-orange-600 dark:fill-orange-500')
+        ->toContain('M23,12l-2.44-2.79');
 });
