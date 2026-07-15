@@ -35,6 +35,7 @@
                 'author_name' => (string) ($image['author_name'] ?? ''),
                 'author_url' => filled($image['author_url'] ?? null) ? (string) $image['author_url'] : null,
                 'author_avatar' => (string) ($image['author_avatar'] ?? ''),
+                'author_verified' => (bool) ($image['author_verified'] ?? false),
             ])
             ->values()
             ->all();
@@ -396,6 +397,9 @@
 
                         <span class="inline-flex min-w-0 items-center gap-1">
                             <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                            <span x-show="currentBackground() && currentBackground().author_verified" x-cloak class="inline-flex shrink-0" data-auth-background-verified-badge>
+                                <x-marketing.elements.verified-badge />
+                            </span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3 shrink-0"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                         </span>
                     </a>
@@ -405,6 +409,9 @@
                             <img x-bind:src="currentBackground() ? currentBackground().author_avatar : ''" x-bind:alt="currentBackground() ? currentBackground().author_name : ''" class="size-full object-cover rounded-full overflow-hidden">
                         </span>
                         <span x-text="currentBackground() ? currentBackground().author_name : ''" class="max-w-40 truncate italic"></span>
+                        <span x-show="currentBackground() && currentBackground().author_verified" x-cloak class="inline-flex shrink-0" data-auth-background-verified-badge>
+                            <x-marketing.elements.verified-badge />
+                        </span>
                     </span>
 
                 </p>
