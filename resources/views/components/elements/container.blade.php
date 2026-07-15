@@ -20,7 +20,7 @@
 
 <div id="auth-container-parent" class="relative w-full sm:max-w-md {{ $containerParentClasses }}">
     <div id="auth-container"
-         class="relative z-20 flex flex-col justify-center items-stretch px-10 py-8 w-full h-screen bg-gray-800 dark:bg-black sm:top-auto sm:h-full overflow-y-auto {{ $containerClasses }} !border-0">
+         class="relative z-20 flex flex-col justify-center items-stretch px-10 py-8 w-full h-screen bg-gray-800 dark:bg-black sm:top-auto sm:h-full overflow-y-auto {{ $containerClasses }} border-0!">
         {{ $slot }}
     </div>
 
