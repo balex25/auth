@@ -30,9 +30,18 @@
             (() => {
                 const form = document.getElementById('passwordless-login-form');
 
-                if (form) {
-                    window.requestAnimationFrame(() => form.submit());
+                if (!form) {
+                    return;
                 }
+
+                const submit = () => window.requestAnimationFrame(() => form.submit());
+
+                if (window.Livewire) {
+                    submit();
+                    return;
+                }
+
+                document.addEventListener('livewire:initialized', submit, { once: true });
             })();
         </script>
     @endif

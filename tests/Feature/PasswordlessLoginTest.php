@@ -145,6 +145,9 @@ it('does not consume a magic link on get and allows it only once on post', funct
         ->assertSuccessful()
         ->assertSee('auth.passwordless.confirm_button')
         ->assertSee('passwordless-login-form')
+        ->assertSee('data-update-uri=', false)
+        ->assertSee('[x-cloak]', false)
+        ->assertSee("document.addEventListener('livewire:initialized', submit", false)
         ->assertSee('form.submit()', false);
     $this->assertGuest();
 
