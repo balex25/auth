@@ -49,6 +49,8 @@ it('guards the passwordless login UI and action with the feature setting', funct
         ->toContain("config('devdojo.auth.settings.passwordless_login_enabled', false) && ! \$showPasswordField")
         ->and(config('devdojo.auth.language.login.passwordless_button'))
         ->toBe('Continue with passwordless')
+        ->and(config('devdojo.auth.language.login.passwordless_sent'))
+        ->toBe('Check your email. We sent you a one-time sign-in link. You can safely close this page.')
         ->and($sessionMessageView)
         ->toContain('bg-red-50 dark:bg-red-600')
         ->toContain('bg-orange-50 dark:bg-orange-600')
@@ -147,6 +149,7 @@ it('does not consume a magic link on get and allows it only once on post', funct
         ->assertSee('passwordless-login-form')
         ->assertSee('data-update-uri=', false)
         ->assertSee('[x-cloak]', false)
+        ->assertSee('data-auth-loading-indicator="static"', false)
         ->assertSee("document.addEventListener('livewire:initialized', submit", false)
         ->assertSee('form.submit()', false);
     $this->assertGuest();

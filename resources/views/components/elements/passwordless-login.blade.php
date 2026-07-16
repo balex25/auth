@@ -18,6 +18,7 @@
             rounded="md"
             size="md"
             submit="true"
+            loading
             disabled
             aria-disabled="true"
         >

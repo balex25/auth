@@ -4,7 +4,8 @@
     'tag' => 'button',
     'href' => '/',
     'submit' => false,
-    'rounded' => 'full'
+    'rounded' => 'full',
+    'loading' => false,
 ])
 
 @php
@@ -49,6 +50,19 @@ switch ($tag ?? 'button') {
 @endphp
 
 <{!! $tagAttr !!} {!! $attributes->except(['class']) !!} class="@if($type == 'primary'){{ 'auth-component-button text-white bg-orange-600 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-600' }}@endif {{ $sizeClasses }} {{ $typeClasses }} opacity-95 hover:opacity-100 focus:ring-2 focus:ring-offset-2 cursor-pointer inline-flex items-center w-full justify-center disabled:opacity-50 font-semibold focus:outline-none">
-    <svg xmlns="http://www.w3.org/2000/svg" wire:loading @if(isset($loadingTarget)) wire:target="{{ $loadingTarget }}" @endif viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 w-4 h-4 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        data-auth-loading-indicator="{{ $loading ? 'static' : 'livewire' }}"
+        @if(! $loading) wire:loading @endif
+        @if(! $loading && isset($loadingTarget)) wire:target="{{ $loadingTarget }}" @endif
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="mr-1.5 h-4 w-4 animate-spin"
+        aria-hidden="true"
+    ><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
     {{ $slot }}
 </{{ $tagClose }}>

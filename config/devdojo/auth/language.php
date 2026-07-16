@@ -21,7 +21,7 @@ return [
         'change_email' => 'Change Email',
         'continue_with_password' => 'Continue with password',
         'passwordless_button' => 'Continue with passwordless',
-        'passwordless_sent' => 'Check your email. We sent you a one-time sign-in link.',
+        'passwordless_sent' => 'Check your email. We sent you a one-time sign-in link. You can safely close this page.',
         'passwordless_unavailable' => 'Passwordless sign-in is unavailable for this account. Verify the email address and try again.',
         'passwordless_rate_limited' => 'Too many sign-in link requests. Please wait before trying again.',
         'passwordless_send_failed' => 'We could not send a sign-in link right now. Please try again later.',
