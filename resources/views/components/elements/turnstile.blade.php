@@ -24,7 +24,7 @@
                 this.form = this.$el.closest('form');
                 this.form?.addEventListener('submit', event => {
                     if (event.submitter?.matches('[data-auth-turnstile-bypass]')) return;
-                    if (this.$refs.token.value) return;
+                    if (this.hasToken()) return;
 
                     event.preventDefault();
                     event.stopImmediatePropagation();
@@ -34,13 +34,30 @@
 
                 this.form?.addEventListener('click', event => {
                     const button = event.target.closest('[data-auth-turnstile-submit]');
-                    if (!button || !this.form.contains(button) || this.$refs.token.value) return;
+                    if (!button || !this.form.contains(button) || this.hasToken()) return;
 
                     event.preventDefault();
                     event.stopImmediatePropagation();
                     this.pendingButton = button;
                     this.loadTurnstile();
                 }, true);
+            },
+            hasToken() {
+                const token = this.$refs.token.value
+                    || this.$refs.widget.querySelector('[name=cf-turnstile-response]')?.value
+                    || '';
+
+                if (!token) return false;
+
+                this.pendingSubmit = false;
+                this.pendingButton = null;
+
+                if (this.$refs.token.value !== token) {
+                    this.$refs.token.value = token;
+                    this.$refs.token.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                return true;
             },
             loadTurnstile() {
                 if (this.scriptRequested) return;

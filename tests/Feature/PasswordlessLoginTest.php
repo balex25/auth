@@ -62,7 +62,9 @@ it('guards the passwordless login UI and action with the feature setting', funct
         ->toContain("localStorage.getItem('theme')")
         ->toContain("root.classList.toggle('dark', isDark)")
         ->and($turnstileView)
-        ->toContain("event.submitter?.matches('[data-auth-turnstile-bypass]')");
+        ->toContain("event.submitter?.matches('[data-auth-turnstile-bypass]')")
+        ->toContain('if (this.hasToken()) return;')
+        ->toContain('this.$refs.widget.querySelector(\'[name=cf-turnstile-response]\')?.value');
 
     $passwordlessButton = Str::between(
         $loginView,
