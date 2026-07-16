@@ -34,6 +34,7 @@ it('guards the passwordless login UI and action with the feature setting', funct
     $sessionMessageView = file_get_contents(__DIR__.'/../../resources/views/components/elements/session-message.blade.php');
     $themeView = file_get_contents(__DIR__.'/../../resources/views/includes/theme.blade.php');
     $turnstileView = file_get_contents(__DIR__.'/../../resources/views/components/elements/turnstile.blade.php');
+    $authStyles = file_get_contents(__DIR__.'/../../resources/css/auth.css');
     Blade::compileString($loginView);
 
     expect($loginView)
@@ -58,13 +59,18 @@ it('guards the passwordless login UI and action with the feature setting', funct
         ->toContain("@case('warning')")
         ->and($appLayoutView)
         ->toContain("@include('auth::includes.theme')")
+        ->toContain('@livewireScripts')
         ->and($themeView)
         ->toContain("localStorage.getItem('theme')")
         ->toContain("root.classList.toggle('dark', isDark)")
         ->and($turnstileView)
+        ->toContain('this.form?.addEventListener(\'submit\'')
         ->toContain("event.submitter?.matches('[data-auth-turnstile-bypass]')")
-        ->toContain('if (this.hasToken()) return;')
-        ->toContain('this.$refs.widget.querySelector(\'[name=cf-turnstile-response]\')?.value');
+        ->toContain('this.$nextTick(() => this.loadTurnstile())')
+        ->not->toContain('event.preventDefault()')
+        ->and($authStyles)
+        ->toContain('[x-cloak]')
+        ->toContain('display: none !important');
 
     $passwordlessButton = Str::between(
         $loginView,

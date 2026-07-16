@@ -279,7 +279,7 @@ new class() extends Component
                 </div>
 
                 @if($showPasswordField || config('devdojo.auth.settings.passwordless_login_enabled', false))
-                    <x-auth::elements.turnstile action="auth_login" />
+                    <x-auth::elements.turnstile action="auth_login" :eager="$showPasswordField" />
                 @endif
 
                 @error('passwordless')

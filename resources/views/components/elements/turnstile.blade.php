@@ -1,4 +1,7 @@
-@props(['action'])
+@props([
+    'action',
+    'eager' => true,
+])
 
 @php
     $turnstileSiteKey = config('services.turnstile.site_key');
@@ -11,10 +14,9 @@
             siteKey: @js($turnstileSiteKey),
             action: @js($action),
             language: @js($turnstileLanguage),
+            eager: @js($eager),
             widgetId: null,
             scriptRequested: false,
-            pendingSubmit: false,
-            pendingButton: null,
             form: null,
             init() {
                 const load = () => this.loadTurnstile();
@@ -24,40 +26,18 @@
                 this.form = this.$el.closest('form');
                 this.form?.addEventListener('submit', event => {
                     if (event.submitter?.matches('[data-auth-turnstile-bypass]')) return;
-                    if (this.hasToken()) return;
 
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-                    this.pendingSubmit = true;
                     this.loadTurnstile();
                 }, true);
 
                 this.form?.addEventListener('click', event => {
                     const button = event.target.closest('[data-auth-turnstile-submit]');
-                    if (!button || !this.form.contains(button) || this.hasToken()) return;
-
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-                    this.pendingButton = button;
-                    this.loadTurnstile();
+                    if (button && this.form.contains(button)) this.loadTurnstile();
                 }, true);
-            },
-            hasToken() {
-                const token = this.$refs.token.value
-                    || this.$refs.widget.querySelector('[name=cf-turnstile-response]')?.value
-                    || '';
 
-                if (!token) return false;
-
-                this.pendingSubmit = false;
-                this.pendingButton = null;
-
-                if (this.$refs.token.value !== token) {
-                    this.$refs.token.value = token;
-                    this.$refs.token.dispatchEvent(new Event('input', { bubbles: true }));
+                if (this.eager) {
+                    this.$nextTick(() => this.loadTurnstile());
                 }
-
-                return true;
             },
             loadTurnstile() {
                 if (this.scriptRequested) return;
@@ -109,18 +89,6 @@
             setToken(token) {
                 this.$refs.token.value = token;
                 this.$refs.token.dispatchEvent(new Event('input', { bubbles: true }));
-
-                if (token && this.pendingButton) {
-                    const button = this.pendingButton;
-                    this.pendingButton = null;
-                    queueMicrotask(() => button.click());
-                    return;
-                }
-
-                if (token && this.pendingSubmit && this.form) {
-                    this.pendingSubmit = false;
-                    queueMicrotask(() => this.form.requestSubmit());
-                }
             },
             reset() {
                 this.setToken('');

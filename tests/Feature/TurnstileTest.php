@@ -13,14 +13,19 @@ beforeEach(function () {
     config()->set('services.turnstile.secret', 'turnstile-secret-key');
 });
 
-it('lazy loads a visible Turnstile widget on auth pages', function () {
-    Livewire::test('auth.login')
-        ->set('showPasswordField', true)
-        ->assertSee('turnstile-site-key')
-        ->assertSee('api.js?render=explicit', false)
-        ->assertSee("appearance: 'always'", false)
-        ->assertSee('requestSubmit()', false)
-        ->assertSee('auth_login');
+it('eagerly loads a visible Turnstile widget without swallowing the form submission', function () {
+    view()->share('errors', new ViewErrorBag);
+
+    $html = Blade::render('<x-auth::elements.turnstile action="auth_login" :eager="true" />');
+
+    expect($html)
+        ->toContain('turnstile-site-key')
+        ->toContain('api.js?render=explicit')
+        ->toContain("appearance: 'always'")
+        ->toContain('eager: true')
+        ->toContain('auth_login')
+        ->not->toContain('event.preventDefault()')
+        ->not->toContain('requestSubmit()');
 });
 
 it('renders Turnstile in the locale from the auth URL', function (string $locale) {

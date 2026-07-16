@@ -5,6 +5,7 @@
 <title>{{ $title ?? 'Auth' }}</title>
 <meta name="description" content="{{ __('auth.login.description') }}">
 @include('auth::includes.seo')
+@livewireStyles
 
 @if(config('devdojo.auth.settings.dev_mode'))
     @vite(['packages/devdojo/auth/resources/css/auth.css', 'packages/devdojo/auth/resources/css/auth.js'])

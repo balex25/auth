@@ -449,5 +449,6 @@
             </a>
         @endif
     </div>
+    @livewireScripts
 </body>
 </html>
